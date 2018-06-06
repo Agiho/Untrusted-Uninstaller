@@ -12,9 +12,12 @@ public:
 
 	void Input(SDL_Event *e);
 
+	//returns contained text
 	std::string GetText();
 
+	//clears text
 	void ClrTxt();
+	//sets new text
 	void SetTxt(std::string SetTxt);
 
 	void ChangeColor(SDL_Color textCol);
@@ -34,6 +37,8 @@ private:
 	SDL_Color TextColor;
 
 	CTextHandler TxtOnScreen;
+
+	bool BInput;
 };
 
 #endif

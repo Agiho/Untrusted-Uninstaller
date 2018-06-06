@@ -39,6 +39,7 @@ void CTextHandler::SetPos(SDL_Point Point )
 {
 	Pos = Point;
 }
+
 bool CTextHandler::LoadFromRenderedText( std::string textureText, SDL_Color textColor )
 {
 	//Get rid of preexisting texture

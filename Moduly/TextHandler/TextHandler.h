@@ -51,10 +51,13 @@ public:
 
 private:
 
+	//pointer to log
 	CLog *Log;
+
 	//The actual hardware texture
 	SDL_Texture* mTexture;
 
+	//Pointer to rednerer
 	SDL_Renderer* Renderer;
 
 	SDL_Point Pos;

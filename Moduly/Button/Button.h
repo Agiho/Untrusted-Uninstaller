@@ -4,10 +4,12 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
+#include <memory>
 #include "SFX.h"
 #include "Log.h"
 #include "Texture.h"
-#include <memory>
+#include "TextHandler.h"
+
 
 class CButton
 {
@@ -15,7 +17,7 @@ public:
 	CButton(/*SDL_Renderer* Render,  CLog *TLog */);
 	~CButton();
 
-	void Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TButtonsTexture, int IButtonX, int IButtonY, CLog *TLog, SDL_Renderer* Render, std::string SSoundOn= "", std::string SSoundClick = "");
+	void Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TButtonsTexture, int IButtonX, int IButtonY, CLog *TLog, SDL_Renderer* Render, std::string SSoundOn= "", std::string SSoundClick = "", std::string FontPath = "");
 
 	// Set position of button
 	void SetPos(int Tx, int Ty, int Tw = NULL, int Th = NULL);
@@ -37,15 +39,22 @@ public:
 	void SoundOn();
 	void SoundDown();
 
+	//caption setting and retriving options
+	void SetCaption(std::string Cap);
+	std::string GetCaption();
+
 	//Change states of button
 	void StateOut();
 	void StateOn();
 	void StateDown();
-
+	void Active(bool active);
+	bool IsActive();
+	
 	//chcanging and check visibility
 	void ChangeVis(bool BVis);
 	bool ChangeVis();
 	bool GetVis();
+
 
 private:
 	
@@ -57,6 +66,14 @@ private:
 		B_Down = 2,
 		B_Total = 3
 	};
+
+	//is button active
+	bool BActive;
+
+	//caption writen on button
+	std::string Caption;
+	// CaptionHandler
+	CTextHandler CaptionH;
 
 	//sounds of button
 	// mause on

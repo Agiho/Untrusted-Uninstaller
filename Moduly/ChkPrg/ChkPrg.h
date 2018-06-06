@@ -16,6 +16,7 @@ public:
 	ChkPrg();
 	~ChkPrg();
 
+	//takes log file
 	void InstgertLog(CLog *TLog);
 
 	//return program name and path to uninstall it

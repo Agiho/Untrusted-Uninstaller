@@ -10,6 +10,8 @@ CButton::CButton(/*SDL_Renderer* Render, CLog *TLog*/)
 	State = B_Out;
 	BSO = false;
 	BSD = false;
+	BActive = true;
+	Caption = " ";
 }
 
 // Free memory
@@ -20,7 +22,7 @@ CButton::~CButton()
 }
 
 // Initialize variables
-void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TButtonsTexture, int IButtonX , int IButtonY, CLog *TLog, SDL_Renderer* Render, std::string SSoundOn, std::string SSoundClick)
+void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TButtonsTexture, int IButtonX, int IButtonY, CLog *TLog, SDL_Renderer* Render, std::string SSoundOn, std::string SSoundClick, std::string FontPath)
 {
 	Log = TLog;
 	Renderer = Render;
@@ -29,36 +31,44 @@ void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TBu
 	IWidth = Tw;
 	IHeight = Th;
 	TButton = TButtonsTexture;
-	TButton -> Init(Render, TLog);
+	TButton->Init(Render, TLog);
 	SM_On.Init(TLog);
 	SM_Down.Init(TLog);
-	if(SSoundOn != "")
+	if (SSoundOn != "")
 	{
 		SM_On.Load(SSoundOn);
 		BSO = true;
-		
+
 	}
-	if(SSoundClick != "")
+	if (SSoundClick != "")
 	{
 		SM_Down.Load(SSoundClick);
 		BSD = true;
-		
+
 	}
-	
-	if(!(BSO && BSD))
+
+	if (!(BSO && BSD))
 	{
-	 Log->WriteTxt("Unable to load buttons sounds \n");	
+		Log->WriteTxt("Unable to load buttons sounds \n");
 	}
-	
-	
+
 	//Set sprites
-		for( int i = 0; i < B_Total; ++i )
-		{
-			RClips[ i ].x = IButtonX;
-			RClips[ i ].y = IButtonY + (i * IHeight);
-			RClips[ i ].w = IWidth;
-			RClips[ i ].h = IHeight;
-		}
+	for (int i = 0; i < B_Total; ++i)
+	{
+		RClips[i].x = IButtonX;
+		RClips[i].y = IButtonY + (i * IHeight);
+		RClips[i].w = IWidth;
+		RClips[i].h = IHeight;
+	}
+
+	if (FontPath != "")
+	{	
+		SDL_Point Point;
+		int Size = Th / 2;
+		Point.x = PPos.x + (Tw / 2);
+		Point.y = PPos.y + (Th / 2) - Size / 2;
+		CaptionH.Init(Point, FontPath, Size, TLog, Render);
+	}
 }
 
 // Setting topleft point of button
@@ -144,6 +154,7 @@ void CButton::Render()
 {
 	//Render curent state button texture 
 	TButton->Render( PPos.x, PPos.y, &RClips[ State ] );
+	CaptionH.Render();
 }
 
 void CButton::SetDiam(int W, int H)
@@ -173,6 +184,23 @@ void CButton::SoundDown()
 	if(BSD) SM_Down.Play();
 }
 
+void CButton::SetCaption(std::string Cap)
+{
+	Caption = Cap;
+	SDL_Color Col = { 0,0,0 };
+	//Set Text to render
+	CaptionH.LoadFromRenderedText(Caption, Col);
+	SDL_Point Point;
+	//Calculating text position starting point
+	Point.x = PPos.x + (IWidth / 2) - CaptionH.GetWidth() /2 ;
+	Point.y = PPos.y + (IHeight / 2) - (CaptionH.GetHeight() / 2);
+	CaptionH.SetPos(Point);
+}
+std::string CButton::GetCaption()
+{
+	return Caption;
+}
+
 void CButton::StateOut()
 {
 	State = B_Out;
@@ -186,6 +214,15 @@ void CButton::StateOn()
 void CButton::StateDown()
 {
 	State = B_Down;
+}
+
+void CButton::Active(bool active)
+{
+	BActive = active;
+}
+bool CButton::IsActive()
+{
+	return BActive;
 }
 
 void CButton::ChangeVis(bool BVis)

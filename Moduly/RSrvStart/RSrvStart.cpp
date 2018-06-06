@@ -1,6 +1,6 @@
 #include "RSrvStart.h"
 
-RSrvStart::RSrvStart()
+CRSrvStart::CRSrvStart()
 {
 	RemoteLoc = "";
 
@@ -11,12 +11,12 @@ RSrvStart::RSrvStart()
 	hSCM = NULL;
 }
 
-void RSrvStart::InsertLog( CLog *TLog)
+void CRSrvStart::InsertLog( CLog *TLog)
 {
 	Log = TLog;
 }
 
-int RSrvStart::StartRemoteService(std::string Where, std::string Which)
+int CRSrvStart::StartRemoteService(std::string Where, std::string Which)
 {
 	Started = false;
 	//access service control manager
@@ -57,7 +57,7 @@ int RSrvStart::StartRemoteService(std::string Where, std::string Which)
 	return 0;
 }
 
-int RSrvStart::StopRemoteService(std::string Where, std::string Which)
+int CRSrvStart::StopRemoteService(std::string Where, std::string Which)
 {
 	SC_HANDLE hService = ::OpenService(hSCM, 
                                        const_cast<char *>(WhichSrv.c_str()),

@@ -33,7 +33,7 @@ void CCheckBoxCont::Init(CLog *TLog, unsigned int WinW, unsigned int WintH, SDL_
 
 	Slider.Init(TLog, (Frame.x +Frame.w), Frame.y, 20, Frame.h, 20, 20, 20, 30, SliderTex,0,0, Render);
 	Slider.ChangeVis(true);
-	Slider.SetMaxVal((*Programs).size());
+	Slider.SetMaxVal((*Programs).size() - Names.size());
 
 }
 
@@ -79,7 +79,6 @@ void CCheckBoxCont::HandleEvent(SDL_Event *e)
 	//slider handle
 	Slider.HandleEvent(e);
 	CurrentLine = Slider.GetCurValue();
-
 
 	//Checkbox Events  
 
@@ -150,4 +149,10 @@ std::vector<CUinstPrgCont> CCheckBoxCont::GetChkPrograms()
 		if((*Programs)[i].BChecked) Return.push_back(((*Programs)[i]));
 	}
 	return Return;
+}
+
+void CCheckBoxCont::SetNewProgramList(std::vector<CUinstPrgCont> *Prg)
+{
+	Programs = Prg;
+	Slider.SetMaxVal((*Programs).size() - Names.size());
 }

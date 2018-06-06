@@ -22,7 +22,7 @@ public:
 
 	std::vector<CUinstPrgCont> GetChkPrograms();
 
-	//void Update();
+	void SetNewProgramList(std::vector<CUinstPrgCont> *Prg);
 
 
 private:
@@ -33,8 +33,6 @@ private:
 	unsigned int CurrentLine;
 
 	unsigned int WinWidth, WinHeight; //Window size
-
-	//std::shared_ptr<CTexture> Texture; 
 
 	std::vector<SDL_Rect> Sqrs; //checkbox size and position
 

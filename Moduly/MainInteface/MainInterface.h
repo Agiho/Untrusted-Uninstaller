@@ -9,9 +9,11 @@
 #include "TexturesMgr.h"
 #include "UinstPrgCont.h"
 #include "CheckBoxCont.h"
+#include "UserAndIP.h"
 #include "WMIRun.h"
 #include "ChkPrg.h"
 #include "RSrvStart.h"
+#include "PrgSelector.h"
 
 //#include "Slider.h"
 
@@ -20,7 +22,8 @@ class MainInterface
 
 public:
 
-	void Init(CLog *TLog, SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string Textures,  std::vector<CUinstPrgCont> *Programslst);
+	void Init(CLog *TLog, ChkPrg *TChecker, CWMIRun *WMI, SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, 
+		std::string Textures,  std::vector<CUinstPrgCont> *Programslst, std::string FontPath);
 
 	void Render();
 
@@ -37,15 +40,16 @@ private:
 		LOCALCH = 0,
 		GETIP = 1,
 		MAIN = 2,
-		ALL = 3
-
+		PRG_SELECT = 3,
+		UNINST_STATUS = 4,
+		ALL = 5
 
 	};
 
 	Phases Phase;
 
-	ChkPrg Checker;
-	CWMIRun RExec;
+	ChkPrg *Checker;
+	CWMIRun *RExec;
 
 	CLog *Log;
 
@@ -59,12 +63,29 @@ private:
 
 	CTexturesMgr TexCont;
 
+	//Login Info
+
+	std::string IP;
+	std::string USER;
+	std::string PASSWORD;
+
+
 	//BUTTONS
 	CButton Local;
 	CButton Remote;
 
+	//SECTIONS
+	CUserAndIP WAIWin;
 
-	void LoadPos(CLog *TLog, SDL_Renderer* Render, std::string Textures);
+	CCheckBoxCont PrgChkBox;
+
+	CPrgSelector Select;
+
+	//Private functions
+
+	void LoadPos(CLog *TLog, SDL_Renderer* Render, int ID);
+
+	const char* GetTexbyID(int ID);
 };
 
 #endif

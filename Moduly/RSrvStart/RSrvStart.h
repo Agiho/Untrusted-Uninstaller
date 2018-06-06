@@ -2,11 +2,11 @@
 #include <string>
 #include "Log.h"
 
-class RSrvStart
+class CRSrvStart
 {
 public:
 
-	RSrvStart();
+	CRSrvStart();
 
 	void InsertLog( CLog *LTog);
 
