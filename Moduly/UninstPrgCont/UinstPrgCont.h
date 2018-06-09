@@ -31,6 +31,9 @@ private:
 	bool BChecked;
 
 	friend class CCheckBoxCont;
+
+	friend class CMainInterface;
+
 };
 
 #endif

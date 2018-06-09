@@ -14,7 +14,7 @@ class CCheckBoxCont
 
 public:
 
-	void Init(CLog *TLog, unsigned int WinW, unsigned int WintH, SDL_Renderer *Renderer, std::vector<CUinstPrgCont> *Programslst, std::string FontPath, std::shared_ptr<CTexture> SliderTex);
+	void Init(CLog *TLog, SDL_Rect Pos, unsigned int WinW, unsigned int WintH, SDL_Renderer *Renderer, std::vector<CUinstPrgCont> *Programslst, std::string FontPath, std::shared_ptr<CTexture> SliderTex);
 
 	void Render();
 

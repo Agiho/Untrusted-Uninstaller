@@ -17,13 +17,12 @@
 
 //#include "Slider.h"
 
-class MainInterface
+class CMainInterface
 {
 
 public:
 
-	void Init(CLog *TLog, ChkPrg *TChecker, CWMIRun *WMI, SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, 
-		std::string Textures,  std::vector<CUinstPrgCont> *Programslst, std::string FontPath);
+	void Init(CLog *TLog, ChkPrg *TChecker, /*CWMIRun *WMI,*/ SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath);
 
 	void Render();
 
@@ -49,7 +48,7 @@ private:
 	Phases Phase;
 
 	ChkPrg *Checker;
-	CWMIRun *RExec;
+	//CWMIRun *RExec;
 
 	CLog *Log;
 
@@ -76,8 +75,6 @@ private:
 
 	//SECTIONS
 	CUserAndIP WAIWin;
-
-	CCheckBoxCont PrgChkBox;
 
 	CPrgSelector Select;
 

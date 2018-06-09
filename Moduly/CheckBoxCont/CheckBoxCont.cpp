@@ -1,16 +1,15 @@
 #include "CheckBoxCont.h"
 
-void CCheckBoxCont::Init(CLog *TLog, unsigned int WinW, unsigned int WintH, SDL_Renderer *Render, std::vector<CUinstPrgCont> *Programslst, std::string FontPath, std::shared_ptr<CTexture> SliderTex)
+void CCheckBoxCont::Init(CLog *TLog, SDL_Rect Pos, unsigned int WinW, unsigned int WintH, SDL_Renderer *Render, std::vector<CUinstPrgCont> *Programslst, std::string FontPath, std::shared_ptr<CTexture> SliderTex)
 {
 	Log = TLog;
 	Renderer = Render;
 	Programs = Programslst;
 
+	Frame = Pos;
+
 	//filled rectangle
-	Frame.w = (WinW/2);
-	Frame.h = (WintH/2) - 100;
-	Frame.x =  50;
-	Frame.y = WintH - Frame.h - 50;
+	
 	
 	int i = 0;
 	bool Exit = false;
@@ -31,7 +30,7 @@ void CCheckBoxCont::Init(CLog *TLog, unsigned int WinW, unsigned int WintH, SDL_
 	
 	CurrentLine = 0;
 
-	Slider.Init(TLog, (Frame.x +Frame.w), Frame.y, 20, Frame.h, 20, 20, 20, 30, SliderTex,0,0, Render);
+	Slider.Init(TLog, (Frame.x +Frame.w), Frame.y, 20, Frame.h, 50, 50, 50, 50, SliderTex,0,0, Render);
 	Slider.ChangeVis(true);
 	Slider.SetMaxVal((*Programs).size() - Names.size());
 
@@ -77,6 +76,7 @@ void CCheckBoxCont::Render()
 void CCheckBoxCont::HandleEvent(SDL_Event *e)
 {
 	//slider handle
+	Slider.SetVal(CurrentLine);
 	Slider.HandleEvent(e);
 	CurrentLine = Slider.GetCurValue();
 

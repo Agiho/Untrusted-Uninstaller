@@ -2,7 +2,7 @@
 
 void CSlider::Init(CLog *TLog, int Tx, int Ty, int Tw, int Th, int ButW, int ButH, int SliderW, int SliderH,
 	std::shared_ptr<CTexture> Tex, int StartTexX, int StartTexY,
-	SDL_Renderer* Render, std::string SSoundOn = "", std::string SSoundClick = "")
+	SDL_Renderer* Render, std::string SSoundOn, std::string SSoundClick)
 {
 	Log = TLog;
 
@@ -18,28 +18,28 @@ void CSlider::Init(CLog *TLog, int Tx, int Ty, int Tw, int Th, int ButW, int But
 	
 	if (Vertical)
 	{
-
-		Less.Init(Tx, Ty, ButW, ButH, Tex, StartTexX, TLog, Render, SSoundOn, SSoundClick);
-		More.Init(Tx, (Ty + Th - ButH), ButW, ButH, Tex, (StartTexX + ButW + 1), TLog, Render, SSoundOn, SSoundClick);
-		Slider.Init(Tx, Ty + ButH, ButW, ButH, Tex, StartTexX + 2*ButW + 1, TLog, Render, SSoundOn, SSoundClick);
+		
+		More.Init(Tx, (Ty + Th - ButH), ButW, ButH, Tex, StartTexX,0, TLog, Render, SSoundOn, SSoundClick);
+		Less.Init(Tx, Ty, ButW, ButH, Tex, (StartTexX + ButW),0, TLog, Render, SSoundOn, SSoundClick);
+		Slider.Init(Tx, Ty + ButH, ButW, ButH, Tex, StartTexX + 2*ButW,0, TLog, Render, SSoundOn, SSoundClick);
 		BarPos.x = Tx;
 		BarPos.y = Ty;
-		Bar.x = StartTexX + 3 * ButW + 1;
+		Bar.x = StartTexX + 3 * ButW;
 		Bar.y = StartTexY;
-		Bar.w = Tw;
+		Bar.w = ButW;
 		Bar.h = Th;
 	}
 	else
-	{
-		Less.Init(Tx, Ty, ButW, ButH, Tex, StartTexX, TLog, Render, SSoundOn, SSoundClick);
-		More.Init(Tx + Tw - ButW, Ty , ButW, ButH, Tex, (StartTexX + ButW + 1), TLog, Render, SSoundOn, SSoundClick);
-		Slider.Init(Tx + ButW, Ty, ButW, ButH, Tex, StartTexX + 2 * ButW + 1, TLog, Render, SSoundOn, SSoundClick);
+	{	
+		More.Init(Tx + Tw - ButW, Ty , ButW, ButH, Tex, StartTexX,0, TLog, Render, SSoundOn, SSoundClick);
+		Less.Init(Tx, Ty, ButW, ButH, Tex, (StartTexX + ButW),0, TLog, Render, SSoundOn, SSoundClick);
+		Slider.Init(Tx + ButW, Ty, ButW, ButH, Tex, StartTexX + 2 * ButW + 1, 0, TLog, Render, SSoundOn, SSoundClick);
 		BarPos.x = Tx;
 		BarPos.y = Ty;
-		Bar.x = StartTexX + 3 * ButW + 1;
+		Bar.x = StartTexX + 3 * ButW ;
 		Bar.y = StartTexY;
 		Bar.w = Tw;
-		Bar.h = Th;
+		Bar.h = ButH;
 	}
 }
 
@@ -49,6 +49,13 @@ void CSlider::SetMaxVal(unsigned int Val)
 	
 	if (Vertical) Jumpvalue = (SliderPos.h - (2 * Less.GetHeight())) / Val;
 	else Jumpvalue = (SliderPos.w - (2 * Less.GetWidth()) )/ Val;
+}
+
+
+void CSlider::SetVal(unsigned int Val)
+{
+	CurValue = Val;
+	
 }
 
 void CSlider::Render()
@@ -86,7 +93,7 @@ void CSlider::HandleEvent(SDL_Event *e)
 
 			}
 		}
-		Slide(e);
+		//Slide(e);
 	}
 }
 

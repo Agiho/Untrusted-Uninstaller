@@ -39,6 +39,8 @@ private:
 	CTextHandler TxtOnScreen;
 
 	bool BInput;
+
+	unsigned int TxtSize;
 };
 
 #endif

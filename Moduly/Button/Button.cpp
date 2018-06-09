@@ -11,6 +11,7 @@ CButton::CButton(/*SDL_Renderer* Render, CLog *TLog*/)
 	BSO = false;
 	BSD = false;
 	BActive = true;
+	FontInit = false;
 	Caption = " ";
 }
 
@@ -61,6 +62,7 @@ void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TBu
 		RClips[i].h = IHeight;
 	}
 
+	FontInit = false;
 	if (FontPath != "")
 	{	
 		SDL_Point Point;
@@ -68,6 +70,7 @@ void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TBu
 		Point.x = PPos.x + (Tw / 2);
 		Point.y = PPos.y + (Th / 2) - Size / 2;
 		CaptionH.Init(Point, FontPath, Size, TLog, Render);
+		FontInit = true;
 	}
 }
 
@@ -154,7 +157,7 @@ void CButton::Render()
 {
 	//Render curent state button texture 
 	TButton->Render( PPos.x, PPos.y, &RClips[ State ] );
-	CaptionH.Render();
+	if(FontInit)CaptionH.Render();
 }
 
 void CButton::SetDiam(int W, int H)

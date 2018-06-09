@@ -16,6 +16,8 @@ public:
 
 	void SetMaxVal(unsigned int Val);
 
+	void SetVal(unsigned int Val);
+
 	void Render();
 
 	void HandleEvent(SDL_Event *e);

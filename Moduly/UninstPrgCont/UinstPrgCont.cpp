@@ -4,6 +4,8 @@ int CUinstPrgCont::Add(std::string TName, std::string Uninst, std::string QUnins
 {
 	BChecked = false;
 
+	Name = TName;
+
 	//there is already quiet uninstall
 	if(QUninst != "") 
 	{

@@ -72,6 +72,8 @@ private:
 
 	//caption writen on button
 	std::string Caption;
+	bool FontInit;
+
 	// CaptionHandler
 	CTextHandler CaptionH;
 

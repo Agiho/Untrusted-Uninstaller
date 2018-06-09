@@ -12,9 +12,11 @@ void CInputTextBox::Init(CLog *TLog, SDL_Rect Pos, std::string FontPath, SDL_Ren
 		Size = Pos.h -2;
 	}
 
+	TxtSize = Size;
+
 	SDL_Point Point;
 	Point.x = Pos.x + 2;
-	Point.y = Pos.y + 1;
+	Point.y = Pos.y + (Pos.h/2) - Size/2 + 1;
 	TextColor = Color;
 	TxtOnScreen.Init(Point, FontPath, Size, TLog, Render);
 	TxtOnScreen.LoadFromRenderedText(" ",Color);
@@ -122,6 +124,7 @@ void CInputTextBox::ClrTxt()
 void CInputTextBox::SetTxt(std::string SetTxt)
 {
 	Txt = SetTxt;
+	TxtOnScreen.LoadFromRenderedText(Txt,TextColor);
 }
 
 void CInputTextBox::ChangeColor(SDL_Color textCol)
@@ -136,5 +139,5 @@ void CInputTextBox::Render()
 	SDL_SetRenderDrawColor( Renderer, 0x00, 0x00, 0x00, 0xFF ); //black
 	SDL_RenderDrawRect( Renderer, &RPos ); //border
 
-	TxtOnScreen.Render(RPos.x+1, RPos.y + 1); //render on screen
+	TxtOnScreen.Render(RPos.x+1, RPos.y + RPos.h/2 - TxtSize/2  + 1); //render on screen
 }

@@ -1,7 +1,6 @@
 #include "MainInterface.h"
 
-void MainInterface::Init(CLog *TLog, ChkPrg *TChecker, CWMIRun *WMI, SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, 
-	std::string Textures, std::vector<CUinstPrgCont> *Programslst, std::string FontPath)
+void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker /*, CWMIRun *WMI*/ , SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath)
 {
 	Phase = LOCALCH;
 	Log = TLog;
@@ -11,8 +10,8 @@ void MainInterface::Init(CLog *TLog, ChkPrg *TChecker, CWMIRun *WMI, SDL_Rendere
 	LoadPos(TLog, Render,1);
 
 	Checker = TChecker;
-	RExec = WMI;
-
+	//RExec = WMI;
+	//RExec->ConnectWMI();
 
 	SDL_Rect butpos;
 	butpos.x = 0;
@@ -20,13 +19,12 @@ void MainInterface::Init(CLog *TLog, ChkPrg *TChecker, CWMIRun *WMI, SDL_Rendere
 	butpos.w = 100;
 	butpos.h = 50;
 	WAIWin.Init(TLog, TexCont.LoadTex(GetTexbyID(1)), Render, butpos, ScrW, ScrH,  FontPath);
+	Select.Init(TLog, ScrW, ScrH, Render, &Programs, FontPath, TexCont.LoadTex(GetTexbyID(2)), TexCont.LoadTex(GetTexbyID(3)), TexCont.LoadTex(GetTexbyID(1)));
 
-	
-	PrgChkBox.Init(TLog, ScrW ,ScrH ,Render, Programslst,FontPath, TexCont.LoadTex(Textures.c_str()));
-
+	BQuit = false;
 }
 
-void MainInterface::Render()
+void CMainInterface::Render()
 {
 	switch(Phase)
 	{
@@ -43,6 +41,8 @@ void MainInterface::Render()
 
 	case PRG_SELECT:
 
+		Select.Render();
+
 		break;
 
 	case UNINST_STATUS:
@@ -51,12 +51,12 @@ void MainInterface::Render()
 	}
 } 
 
-void MainInterface::Update()
+void CMainInterface::Update()
 {
-
+	Select.Update();
 }
 
-void MainInterface::HandleEvent(SDL_Event *e)
+void CMainInterface::HandleEvent(SDL_Event *e)
 {
 	switch(Phase)
 	{
@@ -64,19 +64,18 @@ void MainInterface::HandleEvent(SDL_Event *e)
 		if (Local.HandleEvent(e))
 		{
 			Programs = Checker->GetPrgandPath();
-			PrgChkBox.SetNewProgramList(&Programs);
-			RExec->ConnectWMI();
+			//RExec->ConnectWMI();
+			Select.SetPrg(&Programs);
 
 			Phase = PRG_SELECT;
 
 		}
-
+		
 		if(Remote.HandleEvent(e)) Phase = GETIP;
 
 		break;
 
 	case GETIP:
-
 		if (WAIWin.HandleEvent(e))
 		{
 			//getting info
@@ -88,12 +87,14 @@ void MainInterface::HandleEvent(SDL_Event *e)
 			CRSrvStart RSrv;
 			RSrv.InsertLog(Log);
 			RSrv.StartRemoteService(IP,"RemoteRegistry");
-
 			//getting program list
 			Programs = Checker->GetPrgandPath(IP);
-			PrgChkBox.SetNewProgramList(&Programs);
-			if(USER == "Domyœlny u¿ytkownik")RExec->ConnectWMI(IP);
-			else RExec->ConnectWMI(IP, USER, PASSWORD);
+	
+			Log->WriteTxt(Programs[0].Name);
+		//	if(USER == "Domyœlny u¿ytkownik")RExec->ConnectWMI(IP);
+		//	else RExec->ConnectWMI(IP, USER, PASSWORD);
+
+			Select.SetPrg(&Programs);
 
 			// stoping service
 			RSrv.StopRemoteService(IP,"RemoteRegistry");
@@ -105,6 +106,8 @@ void MainInterface::HandleEvent(SDL_Event *e)
 
 	case PRG_SELECT:
 
+		Select.HandleEvent(e);
+
 		break;
 
 	case UNINST_STATUS:
@@ -113,26 +116,28 @@ void MainInterface::HandleEvent(SDL_Event *e)
 	}
 }
 
-bool MainInterface::IsQuit()
+bool CMainInterface::IsQuit()
 {
 	return BQuit;
 }
 
-void MainInterface::LoadPos(CLog *TLog, SDL_Renderer* Render, int ID)
+void CMainInterface::LoadPos(CLog *TLog, SDL_Renderer* Render, int ID)
 {
 	unsigned int FirstW = 100; //first 2 buttons width
 	unsigned int FirstH = 50; //first 2 buttons height
-	Local.Init(((ScrWidth/2) - FirstW),((ScrHeight/2) - FirstH/2),FirstW,FirstH,TexCont.LoadTex(GetTexbyID(ID)),0,0, TLog,Render);
-	Remote.Init(((ScrWidth/2) + FirstW),((ScrHeight/2) - FirstH/2),FirstW,FirstH,TexCont.LoadTex(GetTexbyID(ID)),0,0, TLog,Render);
+	Local.Init(((ScrWidth/2) - FirstW),((ScrHeight/2) - FirstH/2),FirstW,FirstH,TexCont.LoadTex(GetTexbyID(ID)),0,0, TLog,Render,"","","PostFont.ttf");
+	Local.SetCaption("Lokalny");
+	Remote.Init(((ScrWidth/2) + FirstW),((ScrHeight/2) - FirstH/2),FirstW,FirstH,TexCont.LoadTex(GetTexbyID(ID)),0,0, TLog,Render,"","","PostFont.ttf");
+	Remote.SetCaption("W sieci");
 
 }
 
-const char* MainInterface::GetTexbyID(int ID)
+const char* CMainInterface::GetTexbyID(int ID)
 {
 	switch (ID)
 	{
 	case 1:
-		return "Textures/Button.png";
+		return "Textures/Buttons.png";
 	case 2:
 		return "Textures/Slider1.png";
 	case 3:

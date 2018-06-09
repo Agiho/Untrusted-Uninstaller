@@ -25,7 +25,6 @@ public:
 private:
 	
 	CLog *Log;
-
 	static const unsigned short int MAX_KEY_LENGTH  = 255;
 	static const unsigned short int MAX_VALUE_NAME_LENGHT = 16383;
 

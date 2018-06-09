@@ -16,6 +16,7 @@
 
 //CREDENTIAL structure
 //http://msdn.microsoft.com/en-us/library/windows/desktop/aa374788%28v=vs.85%29.aspx
+
 #define _WIN32_DCOM
 
 #pragma comment(lib, "wbemuuid.lib")

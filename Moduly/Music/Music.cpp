@@ -8,7 +8,7 @@ CMusic::CMusic()
 CMusic::~CMusic()
 {
 	//free music and memory
-	Mix_FreeMusic(MMusic);
+	if(MMusic) Mix_FreeMusic(MMusic);
 	MMusic = NULL;
 	Log = nullptr;
 }

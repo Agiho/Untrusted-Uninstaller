@@ -11,7 +11,7 @@ class CPrgSelector
 public:
 
 	void Init(CLog *TLog, unsigned int ScrW ,unsigned int ScrH ,SDL_Renderer *Render,  std::vector<CUinstPrgCont> *Programslst, std::string FontPath,
-	std::shared_ptr<CTexture> FirstSlid, std::shared_ptr<CTexture> SecondSlid, std::shared_ptr<CTexture> StdButton, std::shared_ptr<CTexture> PlusButton);
+	std::shared_ptr<CTexture> FirstSlid, std::shared_ptr<CTexture> SecondSlid, std::shared_ptr<CTexture> StdButton);
 
 	void Update();
 
@@ -19,9 +19,13 @@ public:
 
 	void Render();
 
+	void SetPrg(std::vector<CUinstPrgCont> *Prg);
+
 private:
 
 	CLog *Log;
+
+	bool BRenderPrg;
 
 	SDL_Color TxtColor;
 

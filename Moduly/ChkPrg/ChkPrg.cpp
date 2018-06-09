@@ -21,12 +21,15 @@ std::vector<CUinstPrgCont> ChkPrg::GetPrgandPath(std::string Computer)
 	if(Computer == "local")
 	{
 		CheckAll();
-		if(Is64BitOS()) CheckAll("HKEY_LOCAL_MACHINE\\SOFTWARE\Wow6432Node\\Microsoft\Windows\\CurrentVersion\\Uninstall");
+		if(Is64BitOS()) CheckAll("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
 	}
 	else 
 	{
-		CheckAll("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\Windows\\CurrentVersion\\Uninstall",Computer);
-		if(IsRemote64OS(Computer)) CheckAll("HKEY_LOCAL_MACHINE\\SOFTWARE\Wow6432Node\\Microsoft\Windows\\CurrentVersion\\Uninstall",Computer);
+		CheckAll("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall",Computer);
+		if(IsRemote64OS(Computer)) 
+		{ 
+			CheckAll("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall",Computer);
+		}
 	}
 	return PrgDel;
 }
@@ -144,17 +147,17 @@ void ChkPrg::QueryKey(HKEY hKey)
 				}
             } 
         }
-
 		//Add Program to container
 		if (STempPath != "")
-		{
+		{			
 			CUinstPrgCont Temp;
 			Temp.Add(STempName, STempPath, SQuietUninst);
-			PrgDel.push_back(Temp);
+			PrgDel.push_back(Temp);		
 			STempName.clear();
 			STempPath.clear();
 			SQuietUninst.clear();
 		}
+
     }
 }
 
@@ -166,22 +169,37 @@ void ChkPrg::CheckAll(std::string WhichKey, std::string Computer)
 		//local section 
 		
 		//Open Key specified in WhichKey for read
-		if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT(WhichKey.c_str()),0, KEY_READ, &hOpenKey) == ERROR_SUCCESS)
+		if(Is64BitOS())
 		{
-			Log->WriteTxt("Opening key on local computer \n");
-			QueryKey(hOpenKey);
+			if( RegOpenKeyEx(HKEY_LOCAL_MACHINE,TEXT(WhichKey.c_str()),0, KEY_READ | KEY_WOW64_64KEY, &hOpenKey) == ERROR_SUCCESS)
+			{
+				Log->WriteTxt("Opening key on local computer \n");
+				QueryKey(hOpenKey);
+			}
+			else
+			{
+				Log->WriteTxt("Can't open key " + WhichKey + " on local machine\n");
+			}
 		}
 		else
-		{
-			Log->WriteTxt("Can't open key " + WhichKey + " on local machine\n");
+			{
+			if( RegOpenKeyEx(HKEY_LOCAL_MACHINE,TEXT(WhichKey.c_str()),0, KEY_READ, &hOpenKey) == ERROR_SUCCESS)
+			{
+				Log->WriteTxt("Opening key on local computer \n");
+				QueryKey(hOpenKey);
+				}
+			else
+			{
+				Log->WriteTxt("Can't open key " + WhichKey + " on local machine\n");
+			}
 		}
 	  
 	}
 	else
 	{
 		RegConnectRegistry(Computer.c_str(),HKEY_LOCAL_MACHINE,&hOpenKey);
-
-	   if( RegOpenKeyEx(hOpenKey, TEXT(WhichKey.c_str()), 0, KEY_READ, &hOpenKey) == ERROR_SUCCESS )
+	
+	   if( RegOpenKeyEx(hOpenKey, TEXT(WhichKey.c_str()), 0, KEY_ALL_ACCESS /* | KEY_WOW64_64KEY*/, &hOpenKey) == ERROR_SUCCESS )
 	   {
 		   Log->WriteTxt("Opening key on " + Computer + "\n");
 		   QueryKey(hOpenKey);
@@ -223,12 +241,16 @@ bool ChkPrg::IsRemote64OS(std::string SRemoteIP)
 {
 	CWMIRun WMICheck;
 	WMICheck.InsertLog(Log);
-	WMICheck.ConnectWMI(SRemoteIP);
+	WMICheck.ConnectWMI();
+	//WMICheck.ConnectWMI(SRemoteIP);
 	//checks is process running on 64bit machine
-	std::string VerOS =(WMICheck.GetSysInfo()).OSArch;	
+	std::string VerOS = (WMICheck.GetSysInfo()).OSArch;	
+	Log->WriteTxt("Test:");
+	Log->WriteTxt(VerOS);
 	WMICheck.Free();
 	if(VerOS == "64-bit") return true;
 	else return false;
+
 }
 
 void ChkPrg::Free()

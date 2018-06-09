@@ -65,9 +65,13 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 	if(SComp == "local")  strNetworkResource =  L"\\\\.\\root\\CIMV2";
 	else 
 	{		
-		wchar_t Remote[20];
+		wchar_t Remote[64];
+		for(int i = 0; i < 64; ++i)
+		{
+			Remote[i] = NULL;
+		}
 		string SRemote = "\\\\" + SComp +  "\\root\\CIMV2";
-		swprintf(Remote,SRemote.length()+1, L"%s",SRemote.c_str());
+		swprintf(Remote,SRemote.length() +1, L"%s",SRemote.c_str());
 		strNetworkResource = Remote;
 	}
 

@@ -8,12 +8,12 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 
 	Window.h = SCrH / 2;
 	Window.w = SCrW / 2;
-	Window.x = (SCrW / 2) - Window.w;
-	Window.y = (SCrH / 2) - Window.h;
+	Window.x = (SCrW / 2) - Window.w/2;
+	Window.y = (SCrH / 2) - Window.h/2;
 
 	SDL_Rect Position;
 	int TxtHeight = 20;
-	Position.x = Window.x + (Window.w / 2);
+	Position.x = Window.x + (Window.w / 4);
 	Position.y = Window.y + (Window.h / 2) - TxtHeight - 10;
 	Position.h = TxtHeight;
 	Position.w = Window.w / 2;
@@ -30,10 +30,11 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 	Password.Init(TLog, Position, Font, Render, Col, 15);
 	Password.SetTxt("Domyœlne has³o");
 
-	Position.y + TxtHeight + 10;
+	Position.y = Position.y + TxtHeight + 10;
 	LogIn.Init((Position.x + (Position.w / 2)) - PosButTex.w / 2, Position.y, PosButTex.w, PosButTex.h, TTexture, PosButTex.x, PosButTex.y,
-		TLog, Render);
+		TLog, Render,"","", Font);
 	LogIn.ChangeVis(true);
+	LogIn.SetCaption("Zaloguj");
 }
 
 void CUserAndIP::Render()
