@@ -241,13 +241,11 @@ bool ChkPrg::IsRemote64OS(std::string SRemoteIP)
 {
 	CWMIRun WMICheck;
 	WMICheck.InsertLog(Log);
-	WMICheck.ConnectWMI();
-	//WMICheck.ConnectWMI(SRemoteIP);
+
+	WMICheck.ConnectWMI(SRemoteIP);
 	//checks is process running on 64bit machine
 	std::string VerOS = (WMICheck.GetSysInfo()).OSArch;	
-	Log->WriteTxt("Test:");
-	Log->WriteTxt(VerOS);
-	WMICheck.Free();
+	//WMICheck.Free();
 	if(VerOS == "64-bit") return true;
 	else return false;
 

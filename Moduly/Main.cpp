@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	CWindow MainWindow("Untrusted Uninstaller",&Log, 960, 720, SDL_WINDOW_SHOWN);
 	
 	MainWindow.Init();
-	//RExec.ConnectWMI();
+
 	//Getting pointer to renderer
 	pRenderer = MainWindow.GetRenderer();
 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 	SDL_Event e;
 	{
 		
-	Main.Init(&Log, &Checker, /*&RExec,*/ pRenderer, 960,720,"PostFont.ttf");
+	Main.Init(&Log, &Checker, &RExec, pRenderer, 960,720,"PostFont.ttf");
 
 	auto BQuit = false;
 	

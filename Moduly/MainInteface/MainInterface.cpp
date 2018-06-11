@@ -1,6 +1,6 @@
 #include "MainInterface.h"
 
-void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker /*, CWMIRun *WMI*/ , SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath)
+void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker , CWMIRun *WMI , SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath)
 {
 	Phase = LOCALCH;
 	Log = TLog;
@@ -10,8 +10,7 @@ void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker /*, CWMIRun *WMI*/ , SDL_
 	LoadPos(TLog, Render,1);
 
 	Checker = TChecker;
-	//RExec = WMI;
-	//RExec->ConnectWMI();
+	RExec = WMI;
 
 	SDL_Rect butpos;
 	butpos.x = 0;
@@ -64,7 +63,7 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 		if (Local.HandleEvent(e))
 		{
 			Programs = Checker->GetPrgandPath();
-			//RExec->ConnectWMI();
+			RExec->ConnectWMI();
 			Select.SetPrg(&Programs);
 
 			Phase = PRG_SELECT;
@@ -82,17 +81,16 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			IP = WAIWin.GetIP();
 			USER = WAIWin.GetUser();
 			PASSWORD = WAIWin.GetPassword();
-
+	
 			//startring service
 			CRSrvStart RSrv;
 			RSrv.InsertLog(Log);
 			RSrv.StartRemoteService(IP,"RemoteRegistry");
 			//getting program list
 			Programs = Checker->GetPrgandPath(IP);
-	
-			Log->WriteTxt(Programs[0].Name);
-		//	if(USER == "Domyœlny u¿ytkownik")RExec->ConnectWMI(IP);
-		//	else RExec->ConnectWMI(IP, USER, PASSWORD);
+			
+			if(USER == "Domyœlny u¿ytkownik")RExec->ConnectWMI(IP);
+			else RExec->ConnectWMI(IP, USER, PASSWORD);
 
 			Select.SetPrg(&Programs);
 

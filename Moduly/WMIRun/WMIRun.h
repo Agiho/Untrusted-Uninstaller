@@ -114,6 +114,9 @@ private:
 
 	//keeps connecting status
 	bool BConnected;
+
+	//Login info already added
+	bool BSecAdded;
 	
 	string Name; //process Name
 	UINT PID; //process ID

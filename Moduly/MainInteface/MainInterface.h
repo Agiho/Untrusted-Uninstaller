@@ -22,7 +22,7 @@ class CMainInterface
 
 public:
 
-	void Init(CLog *TLog, ChkPrg *TChecker, /*CWMIRun *WMI,*/ SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath);
+	void Init(CLog *TLog, ChkPrg *TChecker, CWMIRun *WMI, SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath);
 
 	void Render();
 
@@ -48,7 +48,7 @@ private:
 	Phases Phase;
 
 	ChkPrg *Checker;
-	//CWMIRun *RExec;
+	CWMIRun *RExec;
 
 	CLog *Log;
 

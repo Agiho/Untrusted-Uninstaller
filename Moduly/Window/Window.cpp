@@ -1,9 +1,8 @@
 #include "Window.h"
-#include "WMIRun.h"
-#include "Window.h"
 
 CWindow::CWindow(std::string WTitle, CLog* LogT, int SCRW ,int SCRH, Uint32 Type  )
 {
+
 	//The window we'll be rendering to
 	Window = NULL;
 
@@ -25,43 +24,25 @@ CWindow::~CWindow()
 // initialize window renderer and image loading
 bool CWindow::Init()
 {
-		//HWND hWnd;
-   //hWnd = FindWindow(NULL, TEXT("Test Window"));
-	/*HWND hWnd = CreateWindow(  
-    "win32app",  
-    "tytl",  
-    WS_OVERLAPPEDWINDOW,  
-    CW_USEDEFAULT, CW_USEDEFAULT,  
-    500, 100,  
-    NULL,  
-    NULL,  
-    hInstance,  
-    NULL  
-);  */
 	// variable for stream and string to get throw
 	std::stringstream Stream;
 	Stream.str("");
 	std::string SErrString;
 	//Succes flag
 	bool Ok = true;
-	SDL_SetHint(SDL_HINT_XINPUT_ENABLED,"0");
-	Log->WriteTxt("Czy kompuluje");
+
 	try
 	{
 		// Initialize SDL
 		//Initialize SDL_ttf
-		CWMIRun R;
-			R.InsertLog(Log);
-			
 		if (TTF_Init() == -1)
 		{
 		Stream <<"SDL_ttf could not initialize! SDL_ttf Error: %s\n" << TTF_GetError() << "\n";
 		SErrString = Stream.str();
 		throw SErrString;
 		}
-		if(SDL_Init(SDL_INIT_VIDEO)) //SDL_INIT_VIDEO | SDL_INIT_AUDIO /* | SDL_INIT_JOYSTICK*/) < 0 )
+		if(SDL_Init(SDL_INIT_VIDEO/* | SDL_INIT_AUDIO /* | SDL_INIT_JOYSTICK*/) < 0 )
 		{
-			
 			//wxception
 			Stream << "SDL could not initialize! SDL Error: %s\n" << SDL_GetError() << "\n";
 			SErrString = Stream.str();
@@ -69,19 +50,18 @@ bool CWindow::Init()
 		}
 		else
 		{
-			
 			//Set filtering to linear
-			//	if( !SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1") )
+				if( !SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1") )
 				{
-			//		//wxception
-				//	Stream << "Warning: Linear texture filtering not enabled! \n";
-			//		SErrString = Stream.str();
-			//		throw SErrString;
+					//wxception
+					Stream << "Warning: Linear texture filtering not enabled! \n";
+					SErrString = Stream.str();
+					throw SErrString;
 				}
+				
 				//Create Window 
-				Window = SDL_CreateWindowFrom(hWnd);
-				//Window = SDL_CreateWindow(Title.c_str(),SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED, ScrWidth, ScrHeight, SDL_WINDOW_FULLSCREEN);
-				R.ConnectWMI();
+				Window = SDL_CreateWindow(Title.c_str(),SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED, ScrWidth, ScrHeight, WType);
+				
 				if(Window == NULL)
 				{
 					//wxception

@@ -24,6 +24,7 @@ CWMIRun::CWMIRun()
 	pStubSink = nullptr;
 
 	BConnected = false;
+	BSecAdded = false;
 }
 
 CWMIRun::~CWMIRun()
@@ -71,7 +72,13 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 			Remote[i] = NULL;
 		}
 		string SRemote = "\\\\" + SComp +  "\\root\\CIMV2";
-		swprintf(Remote,SRemote.length() +1, L"%s",SRemote.c_str());
+
+
+		for(int i = 0; i < SRemote.size(); ++i)
+		{
+			Remote[i] = SRemote[i];
+		}
+
 		strNetworkResource = Remote;
 	}
 
@@ -79,7 +86,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 	{
 		stringstream Mystream;
 		Mystream.clear();
-		Mystream << "Connecting to: " << strNetworkResource << endl;
+		Mystream << "Connecting to: " << SComp  << endl;
 		Log->WriteTxt(Mystream.str());
 	}
 	
@@ -88,7 +95,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 
 	// Initialize COM. -----------------------------------------
 
-	 hres =  CoInitializeEx(0, COINIT_MULTITHREADED);
+	 hres =  CoInitializeEx(0, COINIT_APARTMENTTHREADED);
     if (FAILED(hres))
     {
 		stringstream Mystream;
@@ -102,44 +109,47 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
     }
 
     // Set general COM security levels --------------------------
+	if(BSecAdded)
+	{
+		if (localconn)
+			hres =  CoInitializeSecurity(
+				NULL,
+				-1,                          // COM authentication
+				NULL,                        // Authentication services
+				NULL,                        // Reserved
+				RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
+				RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation
+				NULL,                        // Authentication info
+				EOAC_NONE,                   // Additional capabilities
+				NULL                         // Reserved
+				);
+		else
+			hres =  CoInitializeSecurity(
+				NULL,
+				-1,                          // COM authentication
+				NULL,                        // Authentication services
+				NULL,                        // Reserved
+				RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
+				RPC_C_IMP_LEVEL_IDENTIFY,    // Default Impersonation
+				NULL,                        // Authentication info
+				EOAC_NONE,                   // Additional capabilities
+				NULL                         // Reserved
+				);
 
-    if (localconn)
-        hres =  CoInitializeSecurity(
-            NULL,
-            -1,                          // COM authentication
-            NULL,                        // Authentication services
-            NULL,                        // Reserved
-            RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
-            RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation
-            NULL,                        // Authentication info
-            EOAC_NONE,                   // Additional capabilities
-            NULL                         // Reserved
-            );
-    else
-        hres =  CoInitializeSecurity(
-            NULL,
-            -1,                          // COM authentication
-            NULL,                        // Authentication services
-            NULL,                        // Reserved
-            RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
-            RPC_C_IMP_LEVEL_IDENTIFY,    // Default Impersonation
-            NULL,                        // Authentication info
-            EOAC_NONE,                   // Additional capabilities
-            NULL                         // Reserved
-            );
+		if (FAILED(hres))
+		{
+			stringstream Mystream;
+			Mystream.clear();
+			Mystream << "Failed to initialize security. Error code = 0x" << hex << hres << endl;
+			Mystream << _com_error(hres).ErrorMessage() << endl;			
+			Log->WriteTxt(Mystream.str());
 
-    if (FAILED(hres))
-    {
-		stringstream Mystream;
-		Mystream.clear();
-        Mystream << "Failed to initialize security. Error code = 0x" << hex << hres << endl;
-        Mystream << _com_error(hres).ErrorMessage() << endl;			
-		Log->WriteTxt(Mystream.str());
-
-        CoUninitialize();
+			CoUninitialize();
   
-        return 1;                    // Program has failed.
-    }
+			return 1;                    // Program has failed.
+		}
+		BSecAdded = true;
+	}
 
 	 // Obtain the initial locator to WMI -------------------------
 
@@ -458,50 +468,6 @@ int CWMIRun::ExecMethod(string SMeth)
 	  }
       
 	   VariantClear(&varReturnValue);
-
-	}
-
-	 hres = pOutParams->Get(L"Name", 0, &varReturnValue, NULL, 0);
-
-    if (!FAILED(hres))
-
-    {
-
-      if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))
-	  {
-		  //Dont have any value
-		  stringstream Mystream;
-		  Mystream.clear();
-		  Mystream << "Name : " << ((varReturnValue.vt==VT_NULL) ? "NULL" : "EMPTY") << endl;
-		  Mystream << _com_error(hres).ErrorMessage() << endl;
-		  Log->WriteTxt(Mystream.str());
-		  Name = "";
-	  }
-      else		
-	  {
-		 if ((varReturnValue.vt & VT_ARRAY))
-		{
-			//Value in Array?
-			 stringstream Mystream;
-			 Mystream.clear();
-			 Mystream << "Name : " << "Array types not supported (yet)" << endl;
-		     Mystream << _com_error(hres).ErrorMessage() << endl;
-			 Log->WriteTxt(Mystream.str());
-			 Name = "";
-		}
-		 else
-		 {
-			 //everything OK
-			 stringstream Mystream;
-			 Mystream.clear();
-			 Mystream << "Name : " << varReturnValue.bstrVal << endl;
-			 Log->WriteTxt(Mystream.str());
-			 Name = _com_util::ConvertBSTRToString(varReturnValue.bstrVal);
-		 }
-		
-	  }
-      
-	   VariantClear(&varReturnValue);	
 
 	}
 

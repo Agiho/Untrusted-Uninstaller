@@ -43,13 +43,6 @@ int CRSrvStart::StartRemoteService(std::string Where, std::string Which)
 		Log->WriteTxt(GetLastError());
 		return 1;
     }
-
-
-	if(StartService(hService, 0, NULL)==0)
-    {
-		Log->WriteTxt(GetLastError());
-		return 1;
-    }
  
     CloseServiceHandle(hService);
 
