@@ -39,7 +39,17 @@ void CWMIRun::InsertLog(CLog *Tlog)
 	Log = Tlog;
 }
 
-int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
+void CWMIRun::SecPrevAdded(bool Added)
+{
+	BSecAdded = Added;
+}
+	
+bool CWMIRun::IsSecPrevAdded()
+{
+	return BSecAdded;
+}
+
+int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64, std::string Namespace)
 {
 	//local user logon check
 	if(SUser == "")
@@ -63,7 +73,24 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 	bool localconn = false;
 
 	if(SUser == "")   localconn = true; //user who runs application
-	if(SComp == "local")  strNetworkResource =  L"\\\\.\\root\\CIMV2";
+	if(SComp == "local")
+	{
+		wchar_t Local[64];
+		for(int i = 0; i < 64; ++i)
+		{
+			Local[i] = NULL;
+		}
+
+		//strNetworkResource =  L"\\\\.\\root\\CIMV2";
+		string SLocal = "\\\\." + Namespace;
+
+		for(int i = 0; i < SLocal.size(); ++i)
+		{
+			Local[i] = SLocal[i];
+		}
+
+		strNetworkResource = Local;
+	}
 	else 
 	{		
 		wchar_t Remote[64];
@@ -71,8 +98,8 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 		{
 			Remote[i] = NULL;
 		}
-		string SRemote = "\\\\" + SComp +  "\\root\\CIMV2";
 
+		string SRemote = "\\\\" + SComp + Namespace;                //"\\root\\CIMV2";
 
 		for(int i = 0; i < SRemote.size(); ++i)
 		{
@@ -109,7 +136,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
     }
 
     // Set general COM security levels --------------------------
-	if(BSecAdded)
+	if(!BSecAdded)
 	{
 		if (localconn)
 			hres =  CoInitializeSecurity(
@@ -152,7 +179,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 	}
 
 	 // Obtain the initial locator to WMI -------------------------
-
+	Log->WriteTxt("poszlo security");
     pLoc = NULL;
     hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
 
@@ -173,44 +200,106 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 
     pSvc = NULL;
 
-    if (localconn)  
-        hres = pLoc->ConnectServer(
-             _bstr_t(strNetworkResource),      // Object path of WMI namespace
-             NULL,                    // User name. NULL = current user
-             NULL,                    // User password. NULL = current
-             0,                       // Locale. NULL indicates current
-             NULL,                    // Security flags.
-             0,                       // Authority (e.g. Kerberos)
-             0,                       // Context object
-             &pSvc                    // pointer to IWbemServices proxy
-             );
-    else
-        hres = pLoc->ConnectServer(
-            _bstr_t(strNetworkResource),  // Object path of WMI namespace
-            _bstr_t(pszName),             // User name
-            _bstr_t(pszPwd),              // User password
-            NULL,                // Locale
-            NULL,                // Security flags
-            NULL,                // Authority
-            NULL,                // Context object
-            &pSvc                // IWbemServices proxy
-            );
+	//////////// Connect in native application mode ( in my program it is 32bit app)
+	if(!Force64)
+	{
+		if (localconn)  
+			hres = pLoc->ConnectServer(
+				 _bstr_t(strNetworkResource),       // Object path of WMI namespace
+				 NULL,								// User name. NULL = current user
+				 NULL,								// User password. NULL = current
+				 0,									// Locale. NULL indicates current
+				 NULL,								// Security flags.
+				 0,									// Authority (e.g. Kerberos)
+				 0,									// Context object
+				 &pSvc								// pointer to IWbemServices proxy
+				 );
+		else
+			hres = pLoc->ConnectServer(
+				_bstr_t(strNetworkResource),  // Object path of WMI namespace
+				_bstr_t(pszName),             // User name
+				_bstr_t(pszPwd),              // User password
+				NULL,						  // Locale
+				NULL,						  // Security flags
+				NULL,						  // Authority
+				NULL,						  // Context object
+				&pSvc						  // IWbemServices proxy
+				);
 
-    if (FAILED(hres))
-    {
-		stringstream Mystream;
-		Mystream.clear();		
-        Mystream << "Could not connect. Error code = 0x" << hex << hres << endl;    
-        Mystream << _com_error(hres).ErrorMessage() << endl;
-		Log->WriteTxt(Mystream.str());
+		if (FAILED(hres))
+		{
+			stringstream Mystream;
+			Mystream.clear();		
+			Mystream << "Could not connect. Error code = 0x" << hex << hres << endl;    
+			Mystream << _com_error(hres).ErrorMessage() << endl;
+			Log->WriteTxt(Mystream.str());
 
-        pLoc->Release();
-        CoUninitialize();
+			pLoc->Release();
+			CoUninitialize();
           
-        return 1;                // Program has failed.
-    }
+			return 1;                // Program has failed.
+		}
+	}
 
-	Log->WriteTxt("Connected to root\\CIMV2 WMI namespace\n");
+	//Force 64bit mode on Client Machine, it help for example read 64bit regitry from 32bit application
+
+	else
+	{
+		//Creating context object
+		IWbemContext *pContext = NULL;
+		 hres = CoCreateInstance(CLSID_WbemContext, 0, CLSCTX_INPROC_SERVER, IID_IWbemContext, (LPVOID *) &pContext); 
+		 if (FAILED(hres))
+		{
+			Log->WriteTxt("Can't create contextinstance\n");
+		}
+
+		 // set machine architecture and put information about it into context
+		VARIANT vArchitecture;
+		VariantInit(&vArchitecture);
+		V_VT(&vArchitecture) = VT_I4;
+		V_INT(&vArchitecture) = 64;
+		hres = pContext->SetValue(_bstr_t(L"__ProviderArchitecture"), 0, &vArchitecture);
+		VariantClear(&vArchitecture);
+
+		if (localconn)  
+			hres = pLoc->ConnectServer(
+				 _bstr_t(strNetworkResource),       // Object path of WMI namespace
+				 NULL,								// User name. NULL = current user
+				 NULL,								// User password. NULL = current
+				 0,									// Locale. NULL indicates current
+				 NULL,								// Security flags.
+				 0,									// Authority (e.g. Kerberos)
+				 pContext,							// Context object
+				 &pSvc								// pointer to IWbemServices proxy
+				 );
+		else
+			hres = pLoc->ConnectServer(
+				_bstr_t(strNetworkResource),  // Object path of WMI namespace
+				_bstr_t(pszName),             // User name
+				_bstr_t(pszPwd),              // User password
+				NULL,						  // Locale
+				NULL,						  // Security flags
+				NULL,						  // Authority
+			   pContext,					  // Context object
+				&pSvc						  // IWbemServices proxy
+				);
+
+		if (FAILED(hres))
+		{
+			stringstream Mystream;
+			Mystream.clear();		
+			Mystream << "Could not connect. Error code = 0x" << hex << hres << endl;    
+			Mystream << _com_error(hres).ErrorMessage() << endl;
+			Log->WriteTxt(Mystream.str());
+
+			pLoc->Release();
+			CoUninitialize();
+          
+			return 1;                // Program has failed.
+		}
+	}
+
+	Log->WriteTxt("Connected to " + Namespace + " namespace\n");
 
     // Set security levels on the proxy -------------------------
     if (localconn)
@@ -275,7 +364,20 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass)
 		Log->WriteTxt(Mystream.str());
 	}
 
+	CurNamespace = Namespace;
+
 	return 0;
+}
+
+bool CWMIRun::IsConnected()
+{
+	return BConnected;
+}
+
+std::string CWMIRun::GetCurNamespace()
+{
+	if(BConnected) return CurNamespace;
+	else return ("Not Connected");
 }
 
 int CWMIRun::ExecMethod(string SMeth)
@@ -718,6 +820,258 @@ std::vector<SProcessInfo> CWMIRun::GetProcessInfo()
 	if(!BConnected); //not connected
 	else CheckProcess();
 	return ProcessInfo;
+}
+
+std::vector<std::string> CWMIRun::GetSubKeysNames(std::string MainKey,std::string SKey)
+{
+	BSTR MethodName = SysAllocString(L"EnumKey");
+
+	BSTR ClassName = SysAllocString(L"StdRegProv");
+
+	BSTR ArgName1 = SysAllocString(L"hDefKey");
+	BSTR ArgName2 = SysAllocString(L"sSubKeyName");
+
+
+	IWbemClassObject* pClass = NULL;
+
+	hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL);
+	
+	IWbemClassObject* pInParamsDefinition = NULL;
+
+	hres = pClass->GetMethod(MethodName, 0, &pInParamsDefinition, NULL);
+	
+	IWbemClassObject* pClassInstance = NULL;
+
+	hres = pInParamsDefinition->SpawnInstance(0, &pClassInstance);
+
+	//firt argument in method
+	VARIANT varArg1;
+
+	VariantInit(&varArg1);
+
+	varArg1.vt = VT_UINT;
+
+	
+	if(MainKey == "HKEY_LOCAL_MACHINE") varArg1.uintVal = (ULONG_PTR)HKEY_LOCAL_MACHINE;
+
+	else if(MainKey == "HKEY_CURRENT_USER")	varArg1.uintVal = (ULONG_PTR)HKEY_CURRENT_USER;
+
+	else if(MainKey == "HKEY_CLASSES_ROOT") varArg1.uintVal = (ULONG_PTR)HKEY_CLASSES_ROOT;
+
+	else if(MainKey == "HKEY_USERS") varArg1.uintVal = (ULONG_PTR)HKEY_USERS;
+
+	else if(MainKey == "HKEY_CURRENT_CONFIG") varArg1.uintVal = (ULONG_PTR)HKEY_CURRENT_CONFIG;
+
+	else varArg1.uintVal = (ULONG_PTR)HKEY_LOCAL_MACHINE; //default
+
+	hres = pClassInstance->Put(ArgName1, 0, &varArg1, 0);
+	VariantClear(&varArg1);
+	varArg1.vt = NULL;
+
+	//second argument in method
+	VARIANT varArg2;
+	varArg2.vt = VT_BSTR;
+
+	//conversion string to wchar_t / BSTR
+	wchar_t Key[128];
+	for(int i = 0; i < 128; ++i)
+	{
+		Key[i] = NULL;
+	}
+
+	for(int i = 0; i < SKey.size(); ++i)
+	{
+		Key[i] = SKey[i];
+	}
+	varArg2.bstrVal = SysAllocString(Key);
+	///////////////////////////////////////
+
+	hres = pClassInstance->Put(ArgName2, 0, &varArg2, 0);
+	VariantClear(&varArg2);
+	
+	IWbemCallResult *res = NULL;
+
+	// Execute Method
+	  
+	IWbemClassObject* pOutParams = NULL;
+
+	hres = pSvc->ExecMethod(ClassName, MethodName, 0,
+
+	NULL, pClassInstance, &pOutParams, &res);
+
+	VARIANT varReturnValue;
+
+	std::vector<std::string> Keys;
+
+	//getting safearray of keys names
+	hres = pOutParams->Get(L"sNames", 0, &varReturnValue, NULL, 0);
+
+	 if (!FAILED(hres))
+
+    {
+	//	BSTR *lista =  new BSTR;
+      if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))
+
+		  Log->WriteTxt("No subkeys in this path");
+
+      else
+
+      if ((varReturnValue.vt & VT_ARRAY))
+	  {
+	
+		  // get BSTR data from key
+		  SAFEARRAY *arr = (varReturnValue.parray);
+	 
+		  BSTR *Keyval = (BSTR*)(arr->pvData);
+
+		  string str ="";
+
+		  //size of safearray
+		  long LowBound, UpBound;
+		  SafeArrayGetLBound(arr, 1, &LowBound);
+		  SafeArrayGetUBound(arr, 1, &UpBound);
+		  long cnt_elements = UpBound - LowBound + 1; 
+
+		  //conversion to string
+		  for (int i = 0; i < cnt_elements; ++i)  // iterate through returned values
+		  {
+			  str = (_com_util::ConvertBSTRToString(Keyval[i]));
+			  Keys.push_back(str);
+			  str = "";
+		  }
+	  }
+      else
+		  Log->WriteTxt("Single value?");
+		  Keys.push_back(_com_util::ConvertBSTRToString(varReturnValue.bstrVal));
+
+    } 
+
+    VariantClear(&varReturnValue);
+
+	return Keys;
+}
+
+std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::string ValName)
+{
+	BSTR MethodName = SysAllocString(L"GetStringValue");
+
+	BSTR ClassName = SysAllocString(L"StdRegProv");
+
+
+	BSTR ArgName1 = SysAllocString(L"hDefKey");
+	BSTR ArgName2 = SysAllocString(L"sSubKeyName");
+	BSTR ArgName3 = SysAllocString(L"sValueName");
+
+	IWbemClassObject* pClass = NULL;
+
+	hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL);
+	
+	IWbemClassObject* pInParamsDefinition = NULL;
+
+	hres = pClass->GetMethod(MethodName, 0, &pInParamsDefinition, NULL);
+	
+	IWbemClassObject* pClassInstance = NULL;
+
+	hres = pInParamsDefinition->SpawnInstance(0, &pClassInstance);
+
+	//first argument in method
+	VARIANT varArg1;
+
+	VariantInit(&varArg1);
+
+	varArg1.vt = VT_UINT;
+		
+	if(MainKey == "HKEY_LOCAL_MACHINE") varArg1.uintVal = (ULONG_PTR)HKEY_LOCAL_MACHINE;
+
+	else if(MainKey == "HKEY_CURRENT_USER")	varArg1.uintVal = (ULONG_PTR)HKEY_CURRENT_USER;
+
+	else if(MainKey == "HKEY_CLASSES_ROOT") varArg1.uintVal = (ULONG_PTR)HKEY_CLASSES_ROOT;
+
+	else if(MainKey == "HKEY_USERS") varArg1.uintVal = (ULONG_PTR)HKEY_USERS;
+
+	else if(MainKey == "HKEY_CURRENT_CONFIG") varArg1.uintVal = (ULONG_PTR)HKEY_CURRENT_CONFIG;
+
+	else varArg1.uintVal = (ULONG_PTR)HKEY_LOCAL_MACHINE; //default
+
+	hres = pClassInstance->Put(ArgName1, 0, &varArg1, 0);
+	VariantClear(&varArg1);
+
+	//second argument in method
+	VARIANT varArg2;
+	varArg2.vt = VT_BSTR;
+
+	//conversion string to wchar_t / BSTR
+	wchar_t Key[128];
+	for(int i = 0; i < 128; ++i)
+	{
+		Key[i] = NULL;
+	}
+
+	for(int i = 0; i < SKey.size(); ++i)
+	{
+		Key[i] = SKey[i];
+	}
+	varArg2.bstrVal = SysAllocString(Key);
+	///////////////////////////////////////
+
+	hres = pClassInstance->Put(ArgName2, 0, &varArg2, 0);
+	VariantClear(&varArg2);
+
+	//third argument in method
+	VARIANT varArg3;
+	varArg3.vt = VT_BSTR;
+
+	//conversion string to wchar_t / BSTR
+	wchar_t Value[128];
+	for(int i = 0; i < 128; ++i)
+	{
+		Value[i] = NULL;
+	}
+
+	for(int i = 0; i < ValName.size(); ++i)
+	{
+		Value[i] = ValName[i];
+	}
+	varArg3.bstrVal = SysAllocString(Value);
+	///////////////////////////////////////
+
+	hres = pClassInstance->Put(ArgName3, 0, &varArg3, 0);
+	VariantClear(&varArg3);
+
+	IWbemCallResult *res = NULL;
+
+	// Execute Method
+	  
+	IWbemClassObject* pOutParams = NULL;
+
+	hres = pSvc->ExecMethod(ClassName, MethodName, 0,
+
+	NULL, pClassInstance, &pOutParams, &res);
+
+	VARIANT varReturnValue;
+
+	std::vector<std::wstring> Keys;
+	hres = pOutParams->Get(L"sValue", 0, &varReturnValue, NULL, 0);
+
+	if (!FAILED(hres))
+
+    {
+	//	if value its empty or have null value
+      if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))
+	  {
+		  return "";
+	  }
+      else if ((varReturnValue.vt & VT_ARRAY))
+	  {
+		  Log->WriteTxt("Key value in array not supported\n");
+	  }
+      else
+	  {
+		 string str = (_com_util::ConvertBSTRToString(varReturnValue.bstrVal));
+		 return str;
+	  }
+    } 
+
 }
 
 void CWMIRun::EndWait()

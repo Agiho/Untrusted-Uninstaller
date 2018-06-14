@@ -28,7 +28,8 @@ std::vector<CUinstPrgCont> ChkPrg::GetPrgandPath(std::string Computer)
 		CheckAll("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall",Computer);
 		if(IsRemote64OS(Computer)) 
 		{ 
-			CheckAll("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall",Computer);
+			CheckRemote64Keys(Computer);
+			//CheckAll("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall",Computer);
 		}
 	}
 	return PrgDel;
@@ -249,6 +250,31 @@ bool ChkPrg::IsRemote64OS(std::string SRemoteIP)
 	if(VerOS == "64-bit") return true;
 	else return false;
 
+}
+
+void ChkPrg::CheckRemote64Keys(std::string SRemoteIP, std::string MainKey, std::string WhichKey)
+{
+	CWMIRun RemoKeys;
+	RemoKeys.InsertLog(Log);
+	RemoKeys.SecPrevAdded(true);
+	RemoKeys.ConnectWMI(SRemoteIP, "", "", true, "\\root\\default");
+
+	std::vector<std::string> Keys;
+	Keys = RemoKeys.GetSubKeysNames("HKEY_LOCAL_MACHINE", WhichKey);
+
+	for(int i = 0; i < Keys.size(); ++i)
+	{
+		std::string DisplayName = RemoKeys.GetSringVal("HKEY_LOCAL_MACHINE", WhichKey + Keys[i],"DisplayName");
+		std::string QuietUninstallString = RemoKeys.GetSringVal("HKEY_LOCAL_MACHINE", WhichKey + Keys[i],"QuietUninstallString");
+		std::string UninstallString = RemoKeys.GetSringVal("HKEY_LOCAL_MACHINE", WhichKey + Keys[i],"UninstallString");
+
+		if(DisplayName != "")
+		{
+			CUinstPrgCont TempPrg;
+			TempPrg.Add(DisplayName, UninstallString, QuietUninstallString);
+			PrgDel.push_back(TempPrg);
+		}
+	}
 }
 
 void ChkPrg::Free()

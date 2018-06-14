@@ -36,7 +36,6 @@ using namespace std;
 
 
 class CWMIRun
-
 {
 public:
 
@@ -46,8 +45,19 @@ public:
 	//takes pointer to log file class (it is needed for correct module working
 	void InsertLog(CLog *Tlog);
 
+	// CHange BSecAdded value, Connecting can have problem when somewhere WMI connect before and initialize security, no need to do it twice
+	void SecPrevAdded(bool Added = false);
+	// return BSecAdded value
+	bool IsSecPrevAdded();
+
 	//Connect to WMI root\\CIMV2
-	int ConnectWMI( string SComp = "local", string SUser = "", string SPass = "");
+	int ConnectWMI( string SComp = "local", string SUser = "", string SPass = "", bool Force64 = false, std::string Namespace = "\\root\\CIMV2");
+
+	//return is WMI connected
+	bool IsConnected();
+
+	//return Namespace to which it is connected
+	std::string GetCurNamespace();
 
 	//execute file
 	int ExecMethod(string SMeth);
@@ -56,25 +66,27 @@ public:
 	int Terminate(UINT ID);
 	int Terminate(string Name);
 
-	//start wait until
+	//Wait for process ends
 	int WaitExeEnd(UINT ID);
 	int WaitExeEnd(string Name);
 
-	// is taced procees dead?
+	// is traced procees dead?
 	bool IsProcessDead();
 
 	//get info about machine
 	std::vector<SDiskInfo> GetDiskInfo();
 	SSysInfo GetSysInfo();
 	std::vector<SProcessInfo> GetProcessInfo();
+	
+	//Getting info from registry
+	std::vector<std::string> GetSubKeysNames(std::string MainKey,std::string SKey);//returns list of subkeys name in registry branch //Main Key value axample: "HKEY_LOCAL_MACHINE"
+	std::string GetSringVal(std::string MainKey,std::string SKey,std::string ValName); // returns string contained in value if ValName have vaalue type string    
 
 	//end waiting
 	void EndWait();
 
-
 	//it frees up memory
 	void Free();
-
 
 private:
 
@@ -85,7 +97,6 @@ private:
 	short int CREDUI_MAX_USERNAME_LENGTH ;
 	short int CREDUI_MAX_PASSWORD_LENGTH ;
 
-
 	wchar_t *pszName;
 	wchar_t *pszPwd;
 
@@ -93,6 +104,9 @@ private:
 
 	//localization string
 	string localization;
+
+	//Current connected Namespace
+	string CurNamespace;
 
 	//localization pointers
 	IWbemServices *pSvc;
