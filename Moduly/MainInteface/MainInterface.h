@@ -8,7 +8,7 @@
 #include "Log.h"
 #include "TexturesMgr.h"
 #include "UinstPrgCont.h"
-#include "CheckBoxCont.h"
+#include "TCheckBoxCont.h"
 #include "UserAndIP.h"
 #include "WMIRun.h"
 #include "ChkPrg.h"

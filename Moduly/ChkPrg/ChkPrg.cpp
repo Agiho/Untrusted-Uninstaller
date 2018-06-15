@@ -15,7 +15,12 @@ void ChkPrg::InstgertLog(CLog *TLog)
 	Log = TLog;
 }
 
-std::vector<CUinstPrgCont> ChkPrg::GetPrgandPath(std::string Computer)
+void ChkPrg::InstrtWMIPointer(CWMIRun *TWMI)
+{
+	WMI = TWMI;
+}
+
+std::vector<CUinstPrgCont> ChkPrg::GetPrgandPath(std::string Computer, std::string User, std::string Pass)
 {
 	Free();
 	if(Computer == "local")
@@ -31,6 +36,7 @@ std::vector<CUinstPrgCont> ChkPrg::GetPrgandPath(std::string Computer)
 			CheckRemote64Keys(Computer);
 			//CheckAll("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall",Computer);
 		}
+		
 	}
 	return PrgDel;
 }
@@ -238,26 +244,27 @@ BOOL ChkPrg::Is64BitOS()
    return bIs64BitOS;
 }
 
-bool ChkPrg::IsRemote64OS(std::string SRemoteIP)
+bool ChkPrg::IsRemote64OS(std::string SRemoteIP, std::string User, std::string Pass)
 {
-	CWMIRun WMICheck;
-	WMICheck.InsertLog(Log);
-
-	WMICheck.ConnectWMI(SRemoteIP);
+	//CWMIRun WMICheck;
+	//WMICheck.InsertLog(Log);
+	
+	WMI->ConnectWMI(SRemoteIP, User, Pass);
 	//checks is process running on 64bit machine
-	std::string VerOS = (WMICheck.GetSysInfo()).OSArch;	
+	std::string VerOS = (WMI->GetSysInfo()).OSArch;	
+	WMI->Free();
 	//WMICheck.Free();
 	if(VerOS == "64-bit") return true;
 	else return false;
 
 }
 
-void ChkPrg::CheckRemote64Keys(std::string SRemoteIP, std::string MainKey, std::string WhichKey)
+void ChkPrg::CheckRemote64Keys(std::string SRemoteIP, std::string MainKey, std::string WhichKey,std::string User, std::string Pass)
 {
 	CWMIRun RemoKeys;
 	RemoKeys.InsertLog(Log);
 	RemoKeys.SecPrevAdded(true);
-	RemoKeys.ConnectWMI(SRemoteIP, "", "", true, "\\root\\default");
+	RemoKeys.ConnectWMI(SRemoteIP, User, Pass, true, "\\root\\default");
 
 	std::vector<std::string> Keys;
 	Keys = RemoKeys.GetSubKeysNames("HKEY_LOCAL_MACHINE", WhichKey);

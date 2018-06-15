@@ -179,7 +179,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64,
 	}
 
 	 // Obtain the initial locator to WMI -------------------------
-	Log->WriteTxt("poszlo security");
+
     pLoc = NULL;
     hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
 

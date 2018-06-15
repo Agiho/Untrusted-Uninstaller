@@ -41,6 +41,7 @@ void CSlider::Init(CLog *TLog, int Tx, int Ty, int Tw, int Th, int ButW, int But
 		Bar.w = Tw;
 		Bar.h = ButH;
 	}
+	CurValue = 0;
 }
 
 void CSlider::SetMaxVal(unsigned int Val)

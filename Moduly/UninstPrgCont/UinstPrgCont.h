@@ -30,9 +30,9 @@ private:
 
 	bool BChecked;
 
-	friend class CCheckBoxCont;
-
-	friend class CMainInterface;
+	//firend declaration
+	friend class CPrgSelector;
+	template <typename T> friend class CCheckBoxCont;
 
 };
 

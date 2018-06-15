@@ -19,19 +19,23 @@ public:
 	//takes log file
 	void InstgertLog(CLog *TLog);
 
+	void InstrtWMIPointer(CWMIRun *TWMI);
+
 	//return program name and path to uninstall it
-	std::vector<CUinstPrgCont> GetPrgandPath(std::string Computer = "local");
+	std::vector<CUinstPrgCont> GetPrgandPath(std::string Computer = "local", std::string User = "", std::string Pass = "");
 
 private:
 	
 	CLog *Log;
+
+	CWMIRun *WMI;
+
 	static const unsigned short int MAX_KEY_LENGTH  = 255;
 	static const unsigned short int MAX_VALUE_NAME_LENGHT = 16383;
 
 	//holds program names and path to uninstallation
 	std::vector<CUinstPrgCont> PrgDel;
 
-	//std::map<std::string, std::string> PrgDel;
 
 	void QueryKey(HKEY hKey);
 
@@ -42,9 +46,9 @@ private:
 	BOOL Is64BitOS();
 
 	//check remote system
-	bool IsRemote64OS(std::string SRemoteIP);
+	bool IsRemote64OS(std::string SRemoteIP, std::string User = "", std::string Pass = "");
 
-	void CheckRemote64Keys(std::string SRemoteIP, std::string MainKey = "HKEY_LOCAL_MACHINE", std::string WhichKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\");
+	void CheckRemote64Keys(std::string SRemoteIP, std::string MainKey = "HKEY_LOCAL_MACHINE", std::string WhichKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\", std::string User = "", std::string Pass = "");
 
 	//erases map content andd frees memory
 	void Free();

@@ -18,7 +18,7 @@ void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker , CWMIRun *WMI , SDL_Rend
 	butpos.w = 100;
 	butpos.h = 50;
 	WAIWin.Init(TLog, TexCont.LoadTex(GetTexbyID(1)), Render, butpos, ScrW, ScrH,  FontPath);
-	Select.Init(TLog, ScrW, ScrH, Render, &Programs, FontPath, TexCont.LoadTex(GetTexbyID(2)), TexCont.LoadTex(GetTexbyID(3)), TexCont.LoadTex(GetTexbyID(1)));
+	Select.Init(TLog, RExec, ScrW, ScrH, Render, &Programs, FontPath, TexCont.LoadTex(GetTexbyID(2)), TexCont.LoadTex(GetTexbyID(3)), TexCont.LoadTex(GetTexbyID(1)));
 
 	BQuit = false;
 }
@@ -65,7 +65,7 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			Programs = Checker->GetPrgandPath();
 			RExec->ConnectWMI();
 			Select.SetPrg(&Programs);
-
+			Select.SetWhereConnected("Ten Komputer");
 			Phase = PRG_SELECT;
 
 		}
@@ -86,13 +86,16 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			CRSrvStart RSrv;
 			RSrv.InsertLog(Log);
 			RSrv.StartRemoteService(IP,"RemoteRegistry");
+
 			//getting program list
-			Programs = Checker->GetPrgandPath(IP);
+			Checker->InstrtWMIPointer(RExec);
+			Programs = Checker->GetPrgandPath(IP, USER, PASSWORD);
 			
 			if(USER == "Domyœlny u¿ytkownik")RExec->ConnectWMI(IP);
 			else RExec->ConnectWMI(IP, USER, PASSWORD);
 
 			Select.SetPrg(&Programs);
+			Select.SetWhereConnected(IP);
 
 			// stoping service
 			RSrv.StopRemoteService(IP,"RemoteRegistry");

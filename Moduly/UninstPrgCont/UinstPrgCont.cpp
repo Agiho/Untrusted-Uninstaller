@@ -16,9 +16,9 @@ int CUinstPrgCont::Add(std::string TName, std::string Uninst, std::string QUnins
 	std::transform(Uninst.begin(), Uninst.end(), Uninst.begin(), ::tolower);
 	
 	//checks is it msiexec path
-	if(Uninst.find_first_of("msiexec ") != std::string::npos)
+	if(Uninst.find("msiexec") != std::string::npos)
 	{
-		auto pos = Uninst.find_first_of("/i");
+		auto pos = Uninst.find("/i");
 		if(pos != std::string::npos) Uninst.replace(pos,2,"/x");
 		Uninsstr = Uninst + " /quiet /norestart";
 		return UStr_OK;

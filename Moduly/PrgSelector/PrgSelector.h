@@ -2,7 +2,8 @@
 #define PrgSelector_h
 
 #include "ChkPrg.h"
-#include "CheckBoxCont.h"
+#include "CompInfo.h"
+#include "TCheckBoxCont.h"
 #include "InputTextBox.h"
 
 class CPrgSelector
@@ -10,8 +11,10 @@ class CPrgSelector
 
 public:
 
-	void Init(CLog *TLog, unsigned int ScrW ,unsigned int ScrH ,SDL_Renderer *Render,  std::vector<CUinstPrgCont> *Programslst, std::string FontPath,
+	void Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned int ScrH ,SDL_Renderer *Render,  std::vector<CUinstPrgCont> *Programslst, std::string FontPath,
 	std::shared_ptr<CTexture> FirstSlid, std::shared_ptr<CTexture> SecondSlid, std::shared_ptr<CTexture> StdButton);
+
+	void SetWhereConnected(std::string Name);
 
 	void Update();
 
@@ -27,6 +30,10 @@ private:
 
 	bool BRenderPrg;
 
+	unsigned int NrCheckedPrg;
+
+	CWMIRun *WMI;
+
 	SDL_Color TxtColor;
 
 	CTextHandler HowManyUninst;
@@ -38,11 +45,16 @@ private:
 	CButton FromFile;
 	CButton Begin;
 
-	CCheckBoxCont PrgChkBox;
+	CCheckBoxCont<CUinstPrgCont> PrgChkBox;
+	CCheckBoxCont<SCompInfo> CompChkBox;
 
-	CWMIRun *WMI;
-
+	// pointer to programs list  
 	std::vector<CUinstPrgCont> *Uninstlst;
+
+	// container of computers where too must start uninstallation process
+	std::vector<SCompInfo> CompNames;
+
+	void BeginUninstall();
 };
 
 #endif
