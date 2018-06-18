@@ -7,6 +7,7 @@
 #include <string>
 #include <cmath>
 #include "Log.h"
+#include <vector>
 
 
 class CTextHandler
@@ -29,6 +30,7 @@ public:
 
 	//Creates image from font string
 	bool LoadFromRenderedText(std::string textureText, SDL_Color textColor);
+	bool LoadFromRenderedTextUnicode(std::wstring textureText, SDL_Color textColor);
 
 	//Deallocates texture
 	void Free();

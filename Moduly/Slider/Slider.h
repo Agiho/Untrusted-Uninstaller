@@ -20,9 +20,12 @@ public:
 
 	void Render();
 
+	void Update(unsigned int Val);
+
 	void HandleEvent(SDL_Event *e);
 
 	unsigned int GetCurValue();
+	unsigned int GetMaxVal();
 
 	bool GetVis();
 	void ChangeVis(bool BVis);
@@ -38,7 +41,7 @@ private:
 
 	unsigned int CurValue;
 	unsigned int MaxValue;
-	unsigned int Jumpvalue;
+	unsigned int Size;
 
 	SDL_Rect SliderPos;
 

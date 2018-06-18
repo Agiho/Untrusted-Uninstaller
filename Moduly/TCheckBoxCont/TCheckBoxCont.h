@@ -86,8 +86,11 @@ void CCheckBoxCont<T>::Init(CLog *TLog, SDL_Rect Pos, unsigned int SliderSize, u
 
 	Slider.Init(TLog, (Frame.x + Frame.w), Frame.y, SliderSize, Frame.h, SliderSize, SliderSize, SliderSize, SliderSize, SliderTex, 0, 0, Render);
 	Slider.ChangeVis(true);
+	if(!(*Content).empty())
+	{
 	Slider.SetMaxVal((*Content).size() - Names.size());
-
+	}
+	else Slider.SetMaxVal(0);
 	//checking how many is already checked
 	INrChecked = 0;
 	if(!((*Content).empty()))
@@ -147,7 +150,7 @@ void CCheckBoxCont<T>::HandleEvent(SDL_Event *e)
 	//slider handle
 	Slider.HandleEvent(e);
 	CurrentLine = Slider.GetCurValue();
-
+	
 	//Checkbox Events  
 
 	//If mouse event happened
@@ -219,6 +222,7 @@ void CCheckBoxCont<T>::HandleEvent(SDL_Event *e)
 		}
 
 	}
+	Slider.Update(CurrentLine);
 }
 
 template <class T>
@@ -254,6 +258,7 @@ std::vector<T>* CCheckBoxCont<T>::GetAll()
 template <class T>
 void CCheckBoxCont<T>::AddNewOne(T New)
 {
+	Slider.SetMaxVal(Slider.GetMaxVal() + 1);
 	(*Content).push_back(New);
 }
 

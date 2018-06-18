@@ -55,7 +55,6 @@ public:
 	bool ChangeVis();
 	bool GetVis();
 
-
 private:
 	
 	//button states

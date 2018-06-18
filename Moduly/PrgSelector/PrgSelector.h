@@ -5,6 +5,7 @@
 #include "CompInfo.h"
 #include "TCheckBoxCont.h"
 #include "InputTextBox.h"
+#include "BasicFileDialog.h"
 
 class CPrgSelector
 {

@@ -23,40 +23,50 @@ void CSlider::Init(CLog *TLog, int Tx, int Ty, int Tw, int Th, int ButW, int But
 		Less.Init(Tx, Ty, ButW, ButH, Tex, (StartTexX + ButW),0, TLog, Render, SSoundOn, SSoundClick);
 		Slider.Init(Tx, Ty + ButH, ButW, ButH, Tex, StartTexX + 2*ButW,0, TLog, Render, SSoundOn, SSoundClick);
 		BarPos.x = Tx;
-		BarPos.y = Ty;
+		BarPos.y = Ty + ButH;
 		Bar.x = StartTexX + 3 * ButW;
 		Bar.y = StartTexY;
 		Bar.w = ButW;
-		Bar.h = Th;
+		Bar.h = Th - ButH*2;
+		Slider.SetDiam(ButW, Bar.h);
 	}
 	else
 	{	
 		More.Init(Tx + Tw - ButW, Ty , ButW, ButH, Tex, StartTexX,0, TLog, Render, SSoundOn, SSoundClick);
 		Less.Init(Tx, Ty, ButW, ButH, Tex, (StartTexX + ButW),0, TLog, Render, SSoundOn, SSoundClick);
 		Slider.Init(Tx + ButW, Ty, ButW, ButH, Tex, StartTexX + 2 * ButW + 1, 0, TLog, Render, SSoundOn, SSoundClick);
-		BarPos.x = Tx;
+		BarPos.x = Tx + ButW;
 		BarPos.y = Ty;
 		Bar.x = StartTexX + 3 * ButW ;
 		Bar.y = StartTexY;
-		Bar.w = Tw;
+		Bar.w = Tw - ButW*2;
 		Bar.h = ButH;
 	}
 	CurValue = 0;
+	MaxValue = 0;
 }
 
 void CSlider::SetMaxVal(unsigned int Val)
 {
 	MaxValue = Val;
-	
-	if (Vertical) Jumpvalue = (SliderPos.h - (2 * Less.GetHeight())) / Val;
-	else Jumpvalue = (SliderPos.w - (2 * Less.GetWidth()) )/ Val;
-}
 
+	if(MaxValue)
+		{if (Vertical) 
+		{
+			Size = (SliderPos.h - (2 * Less.GetHeight())) / Val;
+			Slider.SetDiam(Slider.GetWidth() ,Size);
+		}
+		else 
+		{
+			Size = (SliderPos.w - (2 * Less.GetWidth()) )/ Val;
+			Slider.SetDiam(Size,Slider.GetHeight());
+		}
+	}
+}
 
 void CSlider::SetVal(unsigned int Val)
 {
 	CurValue = Val;
-	
 }
 
 void CSlider::Render()
@@ -69,6 +79,12 @@ void CSlider::Render()
 		Slider.Render();
 
 	}
+}
+
+void CSlider::Update(unsigned int Val)
+{
+	if(Vertical)Slider.SetPos(/*X value is the same for all */BarPos.x, BarPos.y + (CurValue * Size)) ;
+	else Slider.SetPos(BarPos.x + (CurValue * Size), BarPos.y /*Y value is the same for all */ ) ;
 }
 
 void CSlider::HandleEvent(SDL_Event *e)
@@ -94,13 +110,18 @@ void CSlider::HandleEvent(SDL_Event *e)
 
 			}
 		}
-		//Slide(e);
+		Slide(e);
 	}
 }
 
 unsigned int CSlider::GetCurValue()
 {
 	return CurValue;
+}
+
+unsigned int CSlider::GetMaxVal()
+{
+	return MaxValue;
 }
 
 bool CSlider::GetVis()
@@ -160,16 +181,20 @@ void CSlider::Slide(SDL_Event *e)
 			case SDL_MOUSEMOTION:
 				
 				//When button is clicked
+				break;
 			case SDL_MOUSEBUTTONDOWN:
-				if (Vertical)
+				if((int)MaxValue > 0)
 				{
-					//count current value thanks to divide position on bar by JumpValue
-					CurValue = (Y - SliderPos.y) / Jumpvalue;
-				}
-				else
-				{
-					//count current value thanks to divide position on bar by JumpValue
-					CurValue = (X - SliderPos.x) / Jumpvalue;
+					if (Vertical)
+					{
+						//count current value thanks to divide position on bar by JumpValue
+						CurValue = (Y - BarPos.y) / Size;
+					}
+					else
+					{
+						//count current value thanks to divide position on bar by JumpValue
+						CurValue = (X - BarPos.x) / Size;
+					}
 				}
 			}
 		}

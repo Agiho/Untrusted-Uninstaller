@@ -5,6 +5,7 @@ CTexture::CTexture()
 {
 	Width = 0;
 	Height = 0;
+	BResized = false;
 	Texture = NULL;
 	Log = nullptr;
 }
@@ -102,18 +103,35 @@ void CTexture::SetAlpha(Uint8 alpha)
 }
 
 //Renders texture with given values
-void CTexture::Render(int x, int y, SDL_Rect* Clip, double Angle, SDL_Point* Center, 
+void CTexture::Render(int x, int y, SDL_Rect* Clip, int NewW, int NewH, double Angle, SDL_Point* Center, 
 		SDL_RendererFlip Flip )
 {
-	//Rendering space
-	SDL_Rect RQuad = {x, y , Width , Height};
+	
+	SDL_Rect RQuad;
 
-	//checking if need piece of image to render
-	if(Clip != NULL)
+	if ((NewW == NULL || NewH == NULL))
 	{
-		RQuad.w = Clip->w;
-		RQuad.h = Clip->h;
+		//Rendering space
+		SDL_Rect Rquad = {x, y , Width , Height};
+
+		//checking if need piece of image to render
+		if (!BResized)
+		{
+			if(Clip != NULL)
+			{
+				Rquad.w = Clip->w;
+				Rquad.h = Clip->h;
+			}
+		}
+		RQuad = Rquad;
 	}
+	else 
+	{
+		//Rendering space
+		SDL_Rect Rquad = {x, y , NewW , NewH};
+		RQuad = Rquad;
+	}
+
 	//render image
 	SDL_RenderCopyEx(Renderer, Texture, Clip, &RQuad, Angle, Center, Flip);
 }
@@ -126,6 +144,13 @@ int CTexture::GetWidth()
 int CTexture::GetHeight()
 {
 	return Height;
+}
+
+void CTexture::Resize(int NewW, int NewH)
+{
+	Width = NewW;
+	Height = NewH;
+	BResized = true;
 }
 
 std::string CTexture::GetPath()

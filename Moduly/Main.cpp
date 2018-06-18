@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 	SDL_Event e;
 	{
 		
-	Main.Init(&Log, &Checker, &RExec, pRenderer, 960,720,"PostFont.ttf");
+	Main.Init(&Log, &Checker, &RExec, pRenderer, 960,720,"c:/Windows/Fonts/times.ttf");
 
 	auto BQuit = false;
 	

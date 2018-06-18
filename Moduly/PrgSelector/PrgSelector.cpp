@@ -23,7 +23,7 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	Pos.x = 10;
 	Pos.y = ScrH - ButH - 10;
 	HowManyUninst.Init(Pos,FontPath, ButH /2 ,TLog, Render);
-	HowManyUninst.LoadFromRenderedText("Programów do odinstalwania: 0", TxtColor);
+	HowManyUninst.LoadFromRenderedText("Zaznaczono do odinstalwania: 0", TxtColor);
 	Pos.x = 10;
 	Pos.y = ButH + 10;
 	WhereConnected.Init(Pos,FontPath, ButH /2,TLog, Render);
@@ -31,7 +31,7 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	Pos.x = ScrW - ButW*3;
 	Pos.y = ButH*2 + ButH/2;
 	WhereInstall.Init(Pos,FontPath, ButH / 2,TLog, Render);
-	WhereInstall.LoadFromRenderedText("Wykonaj Te¿ na:", TxtColor);
+	WhereInstall.LoadFromRenderedTextUnicode(L"Wykonaj te¿ na:", TxtColor);
 	SDL_Rect RectPos;
 	RectPos.x = ScrW - ButW*3;
 	RectPos.y = ButH;
@@ -53,13 +53,16 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	Frame.x = ScrW - (ButW*2) - 100;
 	Frame.y = ScrH - Frame.h - ButH*2;
 
-	CompChkBox.Init(TLog,Frame,50, ScrW, ScrH, Render, &CompNames, FontPath, SecondSlid);
+	CompChkBox.Init(TLog,Frame,50, ScrW, ScrH, Render, &CompNames, FontPath, FirstSlid);
 	NrCheckedPrg = 0;
 }
 
 void CPrgSelector::SetWhereConnected(std::string Name)
 {
-	WhereConnected.LoadFromRenderedText("Pod³¹czony do: " + Name, TxtColor);
+	std::wstring temp(Name.length(),L' ');
+	std::copy(Name.begin(), Name.end(), temp.begin());
+	WhereConnected.LoadFromRenderedTextUnicode(L"Pod³¹czony do: " + temp, TxtColor);
+	
 }
 
 void CPrgSelector::Update()
@@ -68,7 +71,7 @@ void CPrgSelector::Update()
 	{
 		NrCheckedPrg = PrgChkBox.Checked();
 		std::stringstream Mystream;
-		Mystream << "Programów do odinstalwania: " << NrCheckedPrg;
+		Mystream << "Zaznaczono do odinstalwania: " << NrCheckedPrg;
 		HowManyUninst.LoadFromRenderedText(Mystream.str(), TxtColor);
 	}
 }
@@ -81,12 +84,18 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 		{
 			SCompInfo TComp;
 			TComp.Name = IPBox.GetText();
-			TComp.BChecked = false;
+			TComp.BChecked = true;
 			CompChkBox.AddNewOne(TComp);
 			IPBox.SetTxt("");
 		}
 	}
-	FromFile.HandleEvent(e);
+	if(FromFile.HandleEvent(e))
+	{
+		CBasicFileDialog Dial;
+		Dial.CreateOpenFileDialog(NULL, "Wybierz Plik", "C:\\", "All files(*.*)\0*.*\0TextFiles(*.txt)\0*.txt\0", 2);
+		char* path = Dial.ReturnLastPath();
+		Log->WriteTxt(path);
+	}
 	if(Begin.HandleEvent(e))
 	{
 		BeginUninstall();
@@ -94,7 +103,7 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 
 	IPBox.Input(e);
 
-	if(BRenderPrg) PrgChkBox.HandleEvent(e);
+	PrgChkBox.HandleEvent(e);
 	CompChkBox.HandleEvent(e);
 }
 

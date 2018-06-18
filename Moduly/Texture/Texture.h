@@ -28,7 +28,7 @@ public:
 	bool Load(std::string Path);
 
 	//Renders texture with given values
-	void Render(int x = 0, int y = 0, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, 
+	void Render(int x = 0, int y = 0, SDL_Rect* clip = NULL, int NeW = NULL, int NeWH = NULL, double angle = 0.0, SDL_Point* center = NULL, 
 		SDL_RendererFlip flip = SDL_FLIP_NONE); 
 
 	//Set blend mode
@@ -41,6 +41,9 @@ public:
 	int GetWidth();
 	int GetHeight();
 
+	//resize options
+	void Resize(int NewW, int NewH);
+
 	//return path to texture
 	std::string GetPath();
 	
@@ -48,6 +51,9 @@ private:
 
 	// Log file
 	CLog *Log;
+
+	//is this object resized
+	bool BResized;
 
 	//Image diamensions
 	int Width,Height;

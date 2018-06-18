@@ -39,13 +39,11 @@ void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TBu
 	{
 		SM_On.Load(SSoundOn);
 		BSO = true;
-
 	}
 	if (SSoundClick != "")
 	{
 		SM_Down.Load(SSoundClick);
 		BSD = true;
-
 	}
 
 	if (!(BSO && BSD))
@@ -156,7 +154,7 @@ bool CButton::HandleEvent(SDL_Event *e)
 void CButton::Render()
 {
 	//Render curent state button texture 
-	TButton->Render( PPos.x, PPos.y, &RClips[ State ] );
+	TButton->Render( PPos.x, PPos.y, &RClips[ State ], IWidth, IHeight );
 	if(FontInit)CaptionH.Render();
 }
 
