@@ -31,6 +31,7 @@ private:
 	bool BChecked;
 
 	//firend declaration
+	friend class CPrepareUninst;
 	friend class CPrgSelector;
 	template <typename T> friend class CCheckBoxCont;
 

@@ -31,7 +31,12 @@ private:
 
 	SDL_Renderer *Renderer;
 
-	//textbox
+	//Descriptions
+	CTextHandler IPDescrip;
+	CTextHandler UserDescrip;
+	CTextHandler PassDescrip;
+
+	//input textbox
 	CInputTextBox IP;
 	CInputTextBox User;
 	CInputTextBox Password;

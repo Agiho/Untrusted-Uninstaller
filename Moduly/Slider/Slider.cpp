@@ -51,16 +51,20 @@ void CSlider::SetMaxVal(unsigned int Val)
 	MaxValue = Val;
 
 	if(MaxValue)
-		{if (Vertical) 
+	{
+		if (Vertical) 
 		{
 			Size = (SliderPos.h - (2 * Less.GetHeight())) / Val;
+			if(Size == 0) Size = 1;
 			Slider.SetDiam(Slider.GetWidth() ,Size);
 		}
 		else 
 		{
 			Size = (SliderPos.w - (2 * Less.GetWidth()) )/ Val;
+			if(Size == 0) Size = 1;
 			Slider.SetDiam(Size,Slider.GetHeight());
 		}
+		
 	}
 }
 

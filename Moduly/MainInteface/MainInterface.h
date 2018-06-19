@@ -68,7 +68,6 @@ private:
 	std::string USER;
 	std::string PASSWORD;
 
-
 	//BUTTONS
 	CButton Local;
 	CButton Remote;
@@ -80,7 +79,7 @@ private:
 
 	//Private functions
 
-	void LoadPos(CLog *TLog, SDL_Renderer* Render, int ID);
+	void LoadPos(CLog *TLog, SDL_Renderer* Render, int ID, std::string Font);
 
 	const char* GetTexbyID(int ID);
 };

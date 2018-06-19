@@ -20,15 +20,29 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 	SDL_Color Col = { 0,0,0 };
 
 	IP.Init(TLog, Position, Font, Render, Col, 15);
-	IP.SetTxt("Brak IP");
+	IP.SetTxt("");
+
+	SDL_Point PPos = { Position.x - 70, Position.y};
+	IPDescrip.Init(PPos,Font, 15, TLog, Render);
+	IPDescrip.LoadFromRenderedText("Adres IP:", Col);
 
 	Position.y = Window.y + (Window.h / 2);
 	User.Init(TLog, Position, Font, Render, Col, 15);
-	User.SetTxt("Domyœlny u¿ytkownik");
+	User.SetTxt("Domniemany");
+
+	PPos.x = Position.x - 85;
+	PPos.y = Position.y;
+	UserDescrip.Init(PPos,Font, 15, TLog, Render);
+	UserDescrip.LoadFromRenderedTextUnicode(L"U¿ytkownik:", Col);
 
 	Position.y = Window.y + (Window.h / 2) + TxtHeight + 10;
 	Password.Init(TLog, Position, Font, Render, Col, 15);
-	Password.SetTxt("Domyœlne has³o");
+	Password.SetTxt("Domniemane");
+
+	PPos.x = Position.x - 50;
+	PPos.y = Position.y;
+	PassDescrip.Init(PPos,Font, 15, TLog, Render);
+	PassDescrip.LoadFromRenderedTextUnicode(L"Has³o:", Col);
 
 	Position.y = Position.y + TxtHeight + 10;
 	LogIn.Init((Position.x + (Position.w / 2)) - PosButTex.w / 2, Position.y, PosButTex.w, PosButTex.h, TTexture, PosButTex.x, PosButTex.y,
@@ -43,6 +57,10 @@ void CUserAndIP::Render()
 	SDL_RenderFillRect(Renderer, &Window); //render filled rect
 	SDL_SetRenderDrawColor(Renderer, 0x00, 0x00, 0x00, 0); //black
 	SDL_RenderDrawRect(Renderer, &Window); //border
+
+	IPDescrip.Render();
+	UserDescrip.Render();
+	PassDescrip.Render();
 
 	IP.Render();
 	User.Render();

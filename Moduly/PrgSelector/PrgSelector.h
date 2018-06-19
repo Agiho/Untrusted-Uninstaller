@@ -6,6 +6,7 @@
 #include "TCheckBoxCont.h"
 #include "InputTextBox.h"
 #include "BasicFileDialog.h"
+#include "PrepUninst.h"
 
 class CPrgSelector
 {
@@ -29,6 +30,8 @@ private:
 
 	CLog *Log;
 
+	CFile File;
+
 	bool BRenderPrg;
 
 	unsigned int NrCheckedPrg;
@@ -46,6 +49,9 @@ private:
 	CButton FromFile;
 	CButton Begin;
 
+	bool BNeedPrepare;
+	CPrepareUninst WPrepUninst;
+
 	CCheckBoxCont<CUinstPrgCont> PrgChkBox;
 	CCheckBoxCont<SCompInfo> CompChkBox;
 
@@ -55,7 +61,11 @@ private:
 	// container of computers where too must start uninstallation process
 	std::vector<SCompInfo> CompNames;
 
-	void BeginUninstall();
+	//reads stations names or ips from file
+	void FileRead(std::string Path);
+
+	//begins uninstall process
+	void BeginUninstall(std::vector<CUinstPrgCont> Uninstall);
 };
 
 #endif

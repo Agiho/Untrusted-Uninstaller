@@ -7,7 +7,7 @@ void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker , CWMIRun *WMI , SDL_Rend
 	ScrWidth = ScrW;
 	ScrHeight = ScrH;
 	TexCont.Init(Render, TLog);
-	LoadPos(TLog, Render,1);
+	LoadPos(TLog, Render,1,FontPath);
 
 	Checker = TChecker;
 	RExec = WMI;
@@ -91,7 +91,7 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			Checker->InstrtWMIPointer(RExec);
 			Programs = Checker->GetPrgandPath(IP, USER, PASSWORD);
 			
-			if(USER == "Domyœlny u¿ytkownik")RExec->ConnectWMI(IP);
+			if(USER == "Domniemany")RExec->ConnectWMI(IP);
 			else RExec->ConnectWMI(IP, USER, PASSWORD);
 
 			Select.SetPrg(&Programs);
@@ -122,13 +122,13 @@ bool CMainInterface::IsQuit()
 	return BQuit;
 }
 
-void CMainInterface::LoadPos(CLog *TLog, SDL_Renderer* Render, int ID)
+void CMainInterface::LoadPos(CLog *TLog, SDL_Renderer* Render, int ID, std::string Font)
 {
 	unsigned int FirstW = 100; //first 2 buttons width
 	unsigned int FirstH = 50; //first 2 buttons height
-	Local.Init(((ScrWidth/2) - FirstW),((ScrHeight/2) - FirstH/2),FirstW,FirstH,TexCont.LoadTex(GetTexbyID(ID)),0,0, TLog,Render,"","","PostFont.ttf");
+	Local.Init(((ScrWidth/2) - FirstW),((ScrHeight/2) - FirstH/2),FirstW,FirstH,TexCont.LoadTex(GetTexbyID(ID)),0,0, TLog,Render,"","",Font);
 	Local.SetCaption("Lokalny");
-	Remote.Init(((ScrWidth/2) + FirstW),((ScrHeight/2) - FirstH/2),FirstW,FirstH,TexCont.LoadTex(GetTexbyID(ID)),0,0, TLog,Render,"","","PostFont.ttf");
+	Remote.Init(((ScrWidth/2) + FirstW),((ScrHeight/2) - FirstH/2),FirstW,FirstH,TexCont.LoadTex(GetTexbyID(ID)),0,0, TLog,Render,"","",Font);
 	Remote.SetCaption("W sieci");
 
 }
