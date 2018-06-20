@@ -69,10 +69,10 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 
 void CPrgSelector::SetWhereConnected(std::string Name)
 {
+	ConnectedTo = Name;
 	std::wstring temp(Name.length(),L' ');
 	std::copy(Name.begin(), Name.end(), temp.begin());
 	WhereConnected.LoadFromRenderedTextUnicode(L"Pod³¹czony do: " + temp, TxtColor);
-	
 }
 
 void CPrgSelector::Update()
@@ -110,7 +110,7 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 		{
 			CBasicFileDialog Dial;
 			Dial.CreateOpenFileDialog(NULL, "Wybierz Plik", "C:\\", "All files(*.*)\0*.*\0TextFiles(*.txt)\0*.txt\0", 2);
-			char* path = Dial.ReturnLastPath();
+			const char* path = Dial.ReturnLastPath();
 			Log->WriteTxt("Reading computers list from file " + std::string(path));
 			FileRead(path);
 		}
@@ -157,6 +157,7 @@ void CPrgSelector::Render()
 void CPrgSelector::SetPrg(std::vector<CUinstPrgCont> *Prg)
 {
 	BRenderPrg = true;
+	Uninstlst = Prg;
 	PrgChkBox.SetNewList(Prg);
 }
 
@@ -204,6 +205,15 @@ void CPrgSelector::BeginUninstall(std::vector<CUinstPrgCont> Uninstall)
 		{
 			WMI->ExecMethod(Uninstall[i].Uninsstr);
 		}
+		std::vector<CUinstPrgCont> TempCont;
+		for(int i = 0; i < (*Uninstlst).size(); ++i)
+		{
+			if(!((*Uninstlst)[i].BChecked)) TempCont.push_back((*Uninstlst)[i]);
+		}
+		(*Uninstlst).erase((*Uninstlst).begin(), (*Uninstlst).end());
+		(*Uninstlst) = TempCont;
+		
+		PrgChkBox.ResetChecked();
 	}
 
 	if(!(CompNames.empty()))

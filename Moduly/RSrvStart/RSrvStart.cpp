@@ -30,6 +30,12 @@ int CRSrvStart::StartRemoteService(std::string Where, std::string Which)
                        SERVICES_ACTIVE_DATABASE,
                        SC_MANAGER_ALL_ACCESS);
 
+	//opening service for change state
+	SC_HANDLE hServiceState = OpenService(hSCM, const_cast<char *>(WhichSrv.c_str()), SERVICE_CHANGE_CONFIG);
+	// change service start state to manual
+	ChangeServiceConfig(hServiceState, SERVICE_NO_CHANGE, SERVICE_DEMAND_START, SERVICE_NO_CHANGE, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	
+
 	SC_HANDLE hService = OpenService(hSCM, const_cast<char *>(WhichSrv.c_str()), SERVICE_START);
 
 	if (hService == NULL)

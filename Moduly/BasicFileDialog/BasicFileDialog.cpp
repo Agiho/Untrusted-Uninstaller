@@ -1,5 +1,6 @@
 #include "BasicFileDialog.h"
 
+
 void CBasicFileDialog::CreateOpenFileDialog(HWND hWnd, LPCSTR Title, LPCSTR InitialDirectory, LPCSTR Filter, int FilterIndex)
 	{
 		OPENFILENAME ofn;
@@ -17,18 +18,18 @@ void CBasicFileDialog::CreateOpenFileDialog(HWND hWnd, LPCSTR Title, LPCSTR Init
 		ofn.lpstrFileTitle = NULL;
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-
 		if (GetOpenFileName(&ofn))
 		{
 			 result = ofn.lpstrFile;
 		}
 		else
 		{
-			result = "Empty";
+			result = NULL;
 		}
 	}
 
-char* CBasicFileDialog::ReturnLastPath()
+const char* CBasicFileDialog::ReturnLastPath()
 {
-	return result;
+	if (result == NULL)return "Empty";
+	else return result;
 }

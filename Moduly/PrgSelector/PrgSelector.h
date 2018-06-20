@@ -7,6 +7,7 @@
 #include "InputTextBox.h"
 #include "BasicFileDialog.h"
 #include "PrepUninst.h"
+#include "ChkPrg.h"
 
 class CPrgSelector
 {
@@ -28,30 +29,45 @@ public:
 
 private:
 
+	//LOG
 	CLog *Log;
 
+	// file variable for reading computers list
 	CFile File;
 
+	//where connected
+	std::string ConnectedTo;
+
+	//there is need renderprglist (will be removed)
 	bool BRenderPrg;
 
+	//how many programs are checked
 	unsigned int NrCheckedPrg;
 
+	//pointer to WMI
 	CWMIRun *WMI;
 
+	//text color
 	SDL_Color TxtColor;
 
+	//text displayed 
 	CTextHandler HowManyUninst;
 	CTextHandler WhereConnected;
 	CTextHandler WhereInstall;
 	CInputTextBox IPBox;
 
+	//buttons displayed in program selection screen
 	CButton Plus;
 	CButton FromFile;
 	CButton Begin;
 
+	//need prepare some installations
 	bool BNeedPrepare;
+
+	//preparation for uninstallation class
 	CPrepareUninst WPrepUninst;
 
+	//programs and computers containers
 	CCheckBoxCont<CUinstPrgCont> PrgChkBox;
 	CCheckBoxCont<SCompInfo> CompChkBox;
 

@@ -86,13 +86,16 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			CRSrvStart RSrv;
 			RSrv.InsertLog(Log);
 			RSrv.StartRemoteService(IP,"RemoteRegistry");
+			
+			
 
 			//getting program list
 			Checker->InstrtWMIPointer(RExec);
 			Programs = Checker->GetPrgandPath(IP, USER, PASSWORD);
-			
+
 			if(USER == "Domniemany")RExec->ConnectWMI(IP);
 			else RExec->ConnectWMI(IP, USER, PASSWORD);
+			
 
 			Select.SetPrg(&Programs);
 			Select.SetWhereConnected(IP);

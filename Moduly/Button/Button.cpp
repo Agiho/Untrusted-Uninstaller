@@ -35,6 +35,7 @@ void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TBu
 	TButton->Init(Render, TLog);
 	SM_On.Init(TLog);
 	SM_Down.Init(TLog);
+
 	if (SSoundOn != "")
 	{
 		SM_On.Load(SSoundOn);
@@ -48,7 +49,7 @@ void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TBu
 
 	if (!(BSO && BSD))
 	{
-		Log->WriteTxt("Unable to load buttons sounds \n");
+		//Log->WriteTxt("Unable to load buttons sounds \n");
 	}
 
 	//Set sprites
@@ -142,9 +143,9 @@ bool CButton::HandleEvent(SDL_Event *e)
 					BClicked = true;
 					return BClicked;
 				
-			/*	case SDL_MOUSEBUTTONUP:
-				State = B_Out;
-				return BClicked;  */
+				case SDL_MOUSEBUTTONUP:
+				State = B_On;
+				//return BClicked;  
 			}
 		}
 	}

@@ -45,21 +45,28 @@ private:
 
 	};
 
+	// variable for keep current phase
 	Phases Phase;
 
+	//pointers to checker registry and WMI
 	ChkPrg *Checker;
 	CWMIRun *RExec;
 
 	CLog *Log;
 
+	// variable file with buttonspositions 
 	CFile Positions;
 
+	// programs list
 	std::vector<CUinstPrgCont> Programs;
 
+	//screen width and height
 	unsigned int ScrWidth , ScrHeight;
 
+	//is need quit
 	bool BQuit;
 
+	//texture menager class and container
 	CTexturesMgr TexCont;
 
 	//Login Info
@@ -79,8 +86,10 @@ private:
 
 	//Private functions
 
+	//loading buutons pos
 	void LoadPos(CLog *TLog, SDL_Renderer* Render, int ID, std::string Font);
 
+	//returns texture path for ID
 	const char* GetTexbyID(int ID);
 };
 

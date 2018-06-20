@@ -27,6 +27,8 @@ public:
 
 	unsigned int Checked();
 
+	unsigned int CCheckBoxCont<T>::ResetChecked();
+
 	std::vector<T>* GetAll();
 
 	void AddNewOne(T New);
@@ -240,13 +242,21 @@ template <class T>
 void CCheckBoxCont<T>::SetNewList(std::vector<T> *New)
 {
 	Content = New;
-	Slider.SetMaxVal((*Content).size() - Names.size());
+	int Help =((*Content).size() - Names.size());
+	if(0 < Help )Slider.SetMaxVal((*Content).size() - Names.size());
+	else Slider.SetMaxVal(0);
 }
 
 template <class T>
 unsigned int CCheckBoxCont<T>::Checked()
 {
 	return INrChecked;
+}
+
+template <class T>
+unsigned int CCheckBoxCont<T>::ResetChecked()
+{
+	return INrChecked = 0;
 }
 
 template <class T>
@@ -258,8 +268,10 @@ std::vector<T>* CCheckBoxCont<T>::GetAll()
 template <class T>
 void CCheckBoxCont<T>::AddNewOne(T New)
 {
-	Slider.SetMaxVal(Slider.GetMaxVal() + 1);
 	(*Content).push_back(New);
+	int Help =((*Content).size() - Names.size());
+	if(0 < Help )Slider.SetMaxVal((*Content).size() - Names.size());
+	else Slider.SetMaxVal(0);
 }
 
 

@@ -1,9 +1,7 @@
 #ifndef BasicFileDialog_h
 #define BasicFileDialog_h
 
-
 #include <shobjidl.h> 
-
 #include <windows.h>      // For common windows data types and function headers
 #define STRICT_TYPED_ITEMIDS
 #include <objbase.h>      // For COM headers
@@ -24,7 +22,7 @@ public:
 
 	void CreateOpenFileDialog(HWND hWnd, LPCSTR Title, LPCSTR InitialDirectory, LPCSTR Filter, int FilterIndex);
 
-	char* ReturnLastPath();
+	const char* ReturnLastPath();
 
 private:
 
