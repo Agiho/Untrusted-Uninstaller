@@ -26,7 +26,9 @@ int CRSrvStart::StartRemoteService(std::string Where, std::string Which)
 	RemoteLoc.clear();
 	RemoteLoc = Where;
 	WhichSrv = Which;
-    SC_HANDLE hSCM = OpenSCManager(const_cast<char *>(RemoteLoc.c_str()),
+
+	//open service menager on machine
+    hSCM = OpenSCManager(const_cast<char *>(RemoteLoc.c_str()),
                        SERVICES_ACTIVE_DATABASE,
                        SC_MANAGER_ALL_ACCESS);
 
@@ -35,8 +37,11 @@ int CRSrvStart::StartRemoteService(std::string Where, std::string Which)
 	// change service start state to manual
 	ChangeServiceConfig(hServiceState, SERVICE_NO_CHANGE, SERVICE_DEMAND_START, SERVICE_NO_CHANGE, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	
-
+	//open specified service
 	SC_HANDLE hService = OpenService(hSCM, const_cast<char *>(WhichSrv.c_str()), SERVICE_START);
+
+	//close service handle
+	CloseServiceHandle(hServiceState);
 
 	if (hService == NULL)
     {
@@ -44,12 +49,14 @@ int CRSrvStart::StartRemoteService(std::string Where, std::string Which)
         return 1;
     }
 
+	// start service
 	if(StartService(hService, 0, NULL)==0)
     {
 		Log->WriteTxt(GetLastError());
 		return 1;
     }
  
+	//close service handle
     CloseServiceHandle(hService);
 
 	Started = true;
@@ -58,6 +65,7 @@ int CRSrvStart::StartRemoteService(std::string Where, std::string Which)
 
 int CRSrvStart::StopRemoteService(std::string Where, std::string Which)
 {
+	//open specified service
 	SC_HANDLE hService = ::OpenService(hSCM, 
                                        const_cast<char *>(WhichSrv.c_str()),
                                        SERVICE_STOP);
@@ -67,14 +75,16 @@ int CRSrvStart::StopRemoteService(std::string Where, std::string Which)
 		Log->WriteTxt("ERROR: COULDN'T OPEN SERVICE\n");
         return 1;
     }
- 
+	
     SERVICE_STATUS status;
+	// stop specified service
     if(!ControlService(hService, SERVICE_CONTROL_STOP,&status)) 
 	{
 		Log->WriteTxt("ERROR: COULDN'T STOP SERVICE\n");
 		return 1;
 	}
- 
+
+	//close handles for services 
     CloseServiceHandle(hService);
 
 	CloseServiceHandle(hSCM);

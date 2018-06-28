@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	CLog Log(File.str());
 	ChkPrg Checker;
 	CWMIRun RExec;
-	Checker.InstgertLog(&Log);
+	Checker.InsertLog(&Log);
 	RExec.InsertLog(&Log);
 	
 	CMainInterface Main;

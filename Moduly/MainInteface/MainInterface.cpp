@@ -2,12 +2,12 @@
 
 void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker , CWMIRun *WMI , SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath)
 {
-	Phase = LOCALCH;
+	Phase = LOCALCH; // set starting phase
 	Log = TLog;
 	ScrWidth = ScrW;
 	ScrHeight = ScrH;
 	TexCont.Init(Render, TLog);
-	LoadPos(TLog, Render,1,FontPath);
+	LoadPos(TLog, Render,1,FontPath); // set butons position
 
 	Checker = TChecker;
 	RExec = WMI;
@@ -62,6 +62,7 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 	case LOCALCH:
 		if (Local.HandleEvent(e))
 		{
+			//Login to local Computer
 			Programs = Checker->GetPrgandPath();
 			RExec->ConnectWMI();
 			Select.SetPrg(&Programs);
@@ -70,6 +71,7 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 
 		}
 		
+		//change to window where user input info about login
 		if(Remote.HandleEvent(e)) Phase = GETIP;
 
 		break;
@@ -90,7 +92,7 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			
 
 			//getting program list
-			Checker->InstrtWMIPointer(RExec);
+			Checker->InstertWMIPointer(RExec);
 			Programs = Checker->GetPrgandPath(IP, USER, PASSWORD);
 
 			if(USER == "Domniemany")RExec->ConnectWMI(IP);

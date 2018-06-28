@@ -8,8 +8,8 @@ CWMIRun::CWMIRun()
 	CREDUI_MAX_USERNAME_LENGTH = CRED_MAX_USERNAME_LENGTH;
 	CREDUI_MAX_PASSWORD_LENGTH = (CRED_MAX_CREDENTIAL_BLOB_SIZE / 2);
 
-	pszName = new wchar_t[CREDUI_MAX_USERNAME_LENGTH+1];
-	pszPwd = new wchar_t[CREDUI_MAX_PASSWORD_LENGTH+1];
+	pszName = new wchar_t[CREDUI_MAX_USERNAME_LENGTH+1]; //username
+	pszPwd = new wchar_t[CREDUI_MAX_PASSWORD_LENGTH+1]; // password
 
 	pSvc = nullptr;
 	pLoc = nullptr;
@@ -51,7 +51,7 @@ bool CWMIRun::IsSecPrevAdded()
 
 int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64, std::string Namespace)
 {
-	//local user logon check
+	//is not default user login
 	if(SUser == "")
 	{
 		//swprintf(pszName,5, L"%s","user"); //copying c_string to table w_char
@@ -61,9 +61,9 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64,
 	}
 	else
 	{
-		swprintf(pszName,SUser.length()+1, L"%s",SUser.c_str());
+		swprintf(pszName,SUser.length()+1, L"%s",SUser.c_str()); //conver username to wstring
 
-		swprintf(pszName,SPass.length()+1, L"%s",SPass.c_str());
+		swprintf(pszName,SPass.length()+1, L"%s",SPass.c_str()); //conver password to wstring
 	}
 
     BSTR strNetworkResource;
@@ -72,7 +72,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64,
     //connection rules
 	bool localconn = false;
 
-	if(SUser == "")   localconn = true; //user who runs application
+	if(SUser == "")   localconn = true; //is default user who runs application 
 	if(SComp == "local")
 	{
 		wchar_t Local[64];
@@ -81,7 +81,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64,
 			Local[i] = NULL;
 		}
 
-		//strNetworkResource =  L"\\\\.\\root\\CIMV2";
+		//set namespace
 		string SLocal = "\\\\." + Namespace;
 
 		for(int i = 0; i < SLocal.size(); ++i)
@@ -99,7 +99,8 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64,
 			Remote[i] = NULL;
 		}
 
-		string SRemote = "\\\\" + SComp + Namespace;                //"\\root\\CIMV2";
+		//set computer address and namespace
+		string SRemote = "\\\\" + SComp + Namespace;
 
 		for(int i = 0; i < SRemote.size(); ++i)
 		{
@@ -258,6 +259,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64,
 		VariantInit(&vArchitecture);
 		V_VT(&vArchitecture) = VT_I4;
 		V_INT(&vArchitecture) = 64;
+
 		hres = pContext->SetValue(_bstr_t(L"__ProviderArchitecture"), 0, &vArchitecture);
 		VariantClear(&vArchitecture);
 
@@ -364,7 +366,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64,
 		Log->WriteTxt(Mystream.str());
 	}
 
-	CurNamespace = Namespace;
+	CurNamespace = Namespace; //save current namespace name fo later use
 
 	return 0;
 }
@@ -393,42 +395,42 @@ int CWMIRun::ExecMethod(string SMeth)
 
     pClass = NULL;
 
-    hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL);
+    hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL); //getobject from WMI
 
     pInParamsDefinition = NULL;
 
-    hres = pClass->GetMethod(MethodName, 0, &pInParamsDefinition, NULL);
+    hres = pClass->GetMethod(MethodName, 0, &pInParamsDefinition, NULL); // get definition object
 
     pClassInstance = NULL;
 
-    hres = pInParamsDefinition->SpawnInstance(0, &pClassInstance);
+    hres = pInParamsDefinition->SpawnInstance(0, &pClassInstance); // get instance
 
-	VARIANT varCommand;
+	VARIANT varCommand; // command to run
 
 	VariantInit(&varCommand);
 
     varCommand.vt = VT_BSTR;
 
-	char buffer[512];
+	char buffer[512]; // it must be char* with NULL character at end
 
 	for(int i = 0; i < SMeth.size(); ++i)
 	{
 		buffer[i] = SMeth[i];
 	}
 
-	buffer[SMeth.size()] = NULL;
+	buffer[SMeth.size()] = NULL; //last character NULL
 
 	bstr_t t = buffer;
 	
-	varCommand.bstrVal = t.GetBSTR();//execute command
+	varCommand.bstrVal = t.GetBSTR(); //pass command
 
-    hres = pClassInstance->Put(L"CommandLine", 0, &varCommand, 0); //instance of coomand
+    hres = pClassInstance->Put(L"CommandLine", 0, &varCommand, 0); //put command in instance
 
 	varCommand.vt = NULL;
 
-    VariantClear(&varCommand);
+    VariantClear(&varCommand); //clear variable
 
-	IWbemCallResult *res = NULL;
+	IWbemCallResult *res = NULL; //shoudl be result
 	
 	
 	// Execute Method
@@ -436,6 +438,7 @@ int CWMIRun::ExecMethod(string SMeth)
 	  
 	pOutParams = NULL;
 
+	//Execute methond with command
 	hres = pSvc->ExecMethod(ClassName, MethodName, 0,
 
 	NULL, pClassInstance, &pOutParams, &res);
@@ -481,6 +484,7 @@ int CWMIRun::ExecMethod(string SMeth)
 		return 1;               // Program has failed.
 
 	}
+
 	Log->WriteTxt(SMeth + " executed properly\n");
 	//getting info about running process
     VARIANT varReturnValue;
@@ -489,7 +493,7 @@ int CWMIRun::ExecMethod(string SMeth)
     if (!FAILED(hres))
 
     {
-
+		// Get process ID
       if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))
 	  {
 		  //Dont have any PID
@@ -518,6 +522,7 @@ int CWMIRun::ExecMethod(string SMeth)
 			 stringstream Mystream;
 			 Mystream.clear();
 			 Mystream << "ProcessId : " << varReturnValue.uintVal << endl;
+			 PID = varReturnValue.uintVal;
 			 Log->WriteTxt(Mystream.str());
 			 PID = varReturnValue.uintVal;
 		 }
@@ -534,7 +539,7 @@ int CWMIRun::ExecMethod(string SMeth)
     if (!FAILED(hres))
 
     {
-
+		//get return value, when its executed its always 0
       if ((varReturnValue.vt==VT_NULL) || (varReturnValue.vt==VT_EMPTY))
 	  {
 		  //Dont have any value
@@ -563,6 +568,7 @@ int CWMIRun::ExecMethod(string SMeth)
 			 stringstream Mystream;
 			 Mystream.clear();
 			 Mystream << "ReturnValue : " << varReturnValue.uintVal << endl;
+			 ReturnVal = varReturnValue.uintVal;
 			 Log->WriteTxt(Mystream.str());
 			 ReturnVal = varReturnValue.uintVal;
 		 }
@@ -601,15 +607,15 @@ int CWMIRun::Terminate(UINT ID)
     BSTR ClassNameInstance = SysAllocString(temp);
 
     _bstr_t MethodName = (L"Terminate");
-    BSTR ParameterName = SysAllocString(L"Reason");
+    BSTR ParameterName = SysAllocString(L"Reason"); //why terminate
 
     IWbemClassObject* pClass = NULL;
-    hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL);
+    hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL); //get object
 
     IWbemClassObject* pInParamsDefinition = NULL;
     IWbemClassObject* pOutMethod = NULL;
     hres = pClass->GetMethod(MethodName, 0, 
-        &pInParamsDefinition, &pOutMethod);
+        &pInParamsDefinition, &pOutMethod); //get parameters from method
 
     if (FAILED(hres))
     {
@@ -631,7 +637,7 @@ int CWMIRun::Terminate(UINT ID)
 
     // Store the value for the in parameters
     hres = pClassInstance->Put(L"Reason", 0,
-        &pcVal, 0);
+        &pcVal, 0); //put reaseon in parameter
 
 	//LOG
 	{
@@ -641,7 +647,7 @@ int CWMIRun::Terminate(UINT ID)
 	Log->WriteTxt(Mystream.str());
 	}
 
-    // Execute Method
+    // Execute Terminate Method
     hres = pSvc->ExecMethod(ClassNameInstance, MethodName, 0,
     NULL, pClassInstance, NULL, NULL);
 
@@ -672,13 +678,16 @@ int CWMIRun::Terminate(UINT ID)
 	Mystream << "Terminate process: " << ID << " ended succesfully" << endl;
 	Log->WriteTxt(Mystream.str());
 	}
+	return 0;
 }
 
 int CWMIRun::Terminate(string Name)
 {
 	if(!BConnected) return 2; //not connected
 
-	CheckProcess();
+	CheckProcess(); // get list of processes
+
+	//get PID of process and terminate
 	for(int i = 0; i < ProcessInfo.size(); ++i)
 	{
 		if(ProcessInfo[i].Name == Name) Terminate(ProcessInfo[i].PID);
@@ -712,7 +721,7 @@ int CWMIRun::WaitExeEnd(UINT ID)
 
 	std::string TempCommand; //temporary string for command 
 	Mystream.clear();
-	Mystream << "SELECT * FROM __InstanceDeletionEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_Process' AND TargetInstance.ProcessID = " << ID;
+	Mystream << "SELECT * FROM __InstanceDeletionEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_Process' AND TargetInstance.ProcessID = " << ID; //command waiting for deletion
 	TempCommand ="";
 	TempCommand.clear();
 
@@ -722,12 +731,14 @@ int CWMIRun::WaitExeEnd(UINT ID)
 		buffer[i] = TempCommand[i];
 	}
 
-	buffer[TempCommand.size()] = NULL;
+	buffer[TempCommand.size()] = NULL; //command need ends with NULL character
 	
+	//Query WQL put sink object which waits until process ends
 	hres = pSvc->ExecNotificationQueryAsync(_bstr_t("WQL"), 
 		_bstr_t(buffer), 
 		WBEM_FLAG_SEND_STATUS, 
 		NULL,pStubSink);
+
 	if (FAILED(hres)) 
 	{
 		stringstream Mystream;
@@ -766,7 +777,7 @@ int CWMIRun::WaitExeEnd(string Name)
 
 	std::string TempCommand; //temporary string for command 
 	Mystream.clear();
-	Mystream << "SELECT * FROM __InstanceDeletionEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_Process' AND TargetInstance.Name = " << Name;
+	Mystream << "SELECT * FROM __InstanceDeletionEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_Process' AND TargetInstance.Name = " << Name; //command waiting for deletion
 	TempCommand ="";
 	TempCommand.clear();
 
@@ -776,9 +787,10 @@ int CWMIRun::WaitExeEnd(string Name)
 		buffer[i] = TempCommand[i];
 	}
 
-	buffer[TempCommand.size()] = NULL;
+	buffer[TempCommand.size()] = NULL;//command need ends with NULL character
 	
-	hres = pSvc->ExecNotificationQueryAsync(_bstr_t("WQL"), 
+	//Query WQL put sink object which waits until process ends
+		hres = pSvc->ExecNotificationQueryAsync(_bstr_t("WQL"), 
 		_bstr_t(buffer), 
 		WBEM_FLAG_SEND_STATUS, 
 		NULL,pStubSink);
@@ -824,12 +836,12 @@ std::vector<SProcessInfo> CWMIRun::GetProcessInfo()
 
 std::vector<std::string> CWMIRun::GetSubKeysNames(std::string MainKey,std::string SKey)
 {
-	BSTR MethodName = SysAllocString(L"EnumKey");
+	BSTR MethodName = SysAllocString(L"EnumKey"); //function
 
-	BSTR ClassName = SysAllocString(L"StdRegProv");
+	BSTR ClassName = SysAllocString(L"StdRegProv"); // class
 
-	BSTR ArgName1 = SysAllocString(L"hDefKey");
-	BSTR ArgName2 = SysAllocString(L"sSubKeyName");
+	BSTR ArgName1 = SysAllocString(L"hDefKey"); //args names
+	BSTR ArgName2 = SysAllocString(L"sSubKeyName"); //args anmes
 
 
 	IWbemClassObject* pClass = NULL;
@@ -851,7 +863,7 @@ std::vector<std::string> CWMIRun::GetSubKeysNames(std::string MainKey,std::strin
 
 	varArg1.vt = VT_UINT;
 
-	
+	// Which main key connect
 	if(MainKey == "HKEY_LOCAL_MACHINE") varArg1.uintVal = (ULONG_PTR)HKEY_LOCAL_MACHINE;
 
 	else if(MainKey == "HKEY_CURRENT_USER")	varArg1.uintVal = (ULONG_PTR)HKEY_CURRENT_USER;
@@ -864,7 +876,7 @@ std::vector<std::string> CWMIRun::GetSubKeysNames(std::string MainKey,std::strin
 
 	else varArg1.uintVal = (ULONG_PTR)HKEY_LOCAL_MACHINE; //default
 
-	hres = pClassInstance->Put(ArgName1, 0, &varArg1, 0);
+	hres = pClassInstance->Put(ArgName1, 0, &varArg1, 0); //put first argument
 	VariantClear(&varArg1);
 	varArg1.vt = NULL;
 
@@ -876,7 +888,7 @@ std::vector<std::string> CWMIRun::GetSubKeysNames(std::string MainKey,std::strin
 	wchar_t Key[128];
 	for(int i = 0; i < 128; ++i)
 	{
-		Key[i] = NULL;
+		Key[i] = NULL; //NULL character needed on end
 	}
 
 	for(int i = 0; i < SKey.size(); ++i)
@@ -895,6 +907,7 @@ std::vector<std::string> CWMIRun::GetSubKeysNames(std::string MainKey,std::strin
 	  
 	IWbemClassObject* pOutParams = NULL;
 
+	//Execute that method and enuumerate keys
 	hres = pSvc->ExecMethod(ClassName, MethodName, 0,
 
 	NULL, pClassInstance, &pOutParams, &res);
@@ -936,7 +949,7 @@ std::vector<std::string> CWMIRun::GetSubKeysNames(std::string MainKey,std::strin
 		  for (int i = 0; i < cnt_elements; ++i)  // iterate through returned values
 		  {
 			  str = (_com_util::ConvertBSTRToString(Keyval[i]));
-			  Keys.push_back(str);
+			  Keys.push_back(str); //push it in container
 			  str = "";
 		  }
 	  }
@@ -946,29 +959,29 @@ std::vector<std::string> CWMIRun::GetSubKeysNames(std::string MainKey,std::strin
 
     } 
 
-    VariantClear(&varReturnValue);
+    VariantClear(&varReturnValue); //clear variable
 
 	return Keys;
 }
 
 std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::string ValName)
 {
-	BSTR MethodName = SysAllocString(L"GetStringValue");
+	BSTR MethodName = SysAllocString(L"GetStringValue"); //function
 
-	BSTR ClassName = SysAllocString(L"StdRegProv");
+	BSTR ClassName = SysAllocString(L"StdRegProv"); /class
 
 
-	BSTR ArgName1 = SysAllocString(L"hDefKey");
-	BSTR ArgName2 = SysAllocString(L"sSubKeyName");
-	BSTR ArgName3 = SysAllocString(L"sValueName");
+	BSTR ArgName1 = SysAllocString(L"hDefKey"); //argument 1 name
+	BSTR ArgName2 = SysAllocString(L"sSubKeyName"); //argument 2 name
+	BSTR ArgName3 = SysAllocString(L"sValueName"); //argument 3 name
 
 	IWbemClassObject* pClass = NULL;
 
-	hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL);
+	hres = pSvc->GetObject(ClassName, 0, NULL, &pClass, NULL); //get object
 	
 	IWbemClassObject* pInParamsDefinition = NULL;
 
-	hres = pClass->GetMethod(MethodName, 0, &pInParamsDefinition, NULL);
+	hres = pClass->GetMethod(MethodName, 0, &pInParamsDefinition, NULL); //get parameters
 	
 	IWbemClassObject* pClassInstance = NULL;
 
@@ -981,6 +994,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 
 	varArg1.vt = VT_UINT;
 		
+	//set main key to connect
 	if(MainKey == "HKEY_LOCAL_MACHINE") varArg1.uintVal = (ULONG_PTR)HKEY_LOCAL_MACHINE;
 
 	else if(MainKey == "HKEY_CURRENT_USER")	varArg1.uintVal = (ULONG_PTR)HKEY_CURRENT_USER;
@@ -993,7 +1007,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 
 	else varArg1.uintVal = (ULONG_PTR)HKEY_LOCAL_MACHINE; //default
 
-	hres = pClassInstance->Put(ArgName1, 0, &varArg1, 0);
+	hres = pClassInstance->Put(ArgName1, 0, &varArg1, 0); //put first argument
 	VariantClear(&varArg1);
 
 	//second argument in method
@@ -1004,7 +1018,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	wchar_t Key[128];
 	for(int i = 0; i < 128; ++i)
 	{
-		Key[i] = NULL;
+		Key[i] = NULL; //NULL at end needed
 	}
 
 	for(int i = 0; i < SKey.size(); ++i)
@@ -1014,7 +1028,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	varArg2.bstrVal = SysAllocString(Key);
 	///////////////////////////////////////
 
-	hres = pClassInstance->Put(ArgName2, 0, &varArg2, 0);
+	hres = pClassInstance->Put(ArgName2, 0, &varArg2, 0); //second argument (subkey path)
 	VariantClear(&varArg2);
 
 	//third argument in method
@@ -1025,7 +1039,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	wchar_t Value[128];
 	for(int i = 0; i < 128; ++i)
 	{
-		Value[i] = NULL;
+		Value[i] = NULL;//NULL at end needed
 	}
 
 	for(int i = 0; i < ValName.size(); ++i)
@@ -1035,7 +1049,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	varArg3.bstrVal = SysAllocString(Value);
 	///////////////////////////////////////
 
-	hres = pClassInstance->Put(ArgName3, 0, &varArg3, 0);
+	hres = pClassInstance->Put(ArgName3, 0, &varArg3, 0); // put third argumernt value name from each get its value
 	VariantClear(&varArg3);
 
 	IWbemCallResult *res = NULL;
@@ -1044,6 +1058,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	  
 	IWbemClassObject* pOutParams = NULL;
 
+	// execute method (get string of key value 
 	hres = pSvc->ExecMethod(ClassName, MethodName, 0,
 
 	NULL, pClassInstance, &pOutParams, &res);
@@ -1051,6 +1066,8 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	VARIANT varReturnValue;
 
 	std::vector<std::wstring> Keys;
+
+	//get values from out parameters
 	hres = pOutParams->Get(L"sValue", 0, &varReturnValue, NULL, 0);
 
 	if (!FAILED(hres))
@@ -1076,7 +1093,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 
 void CWMIRun::EndWait()
 {
-	if(BConnected) hres = pSvc->CancelAsyncCall(pSink);
+	if(BConnected) hres = pSvc->CancelAsyncCall(pSink); //stop waiting
 }
 
 void CWMIRun::Free()
@@ -1120,7 +1137,7 @@ int CWMIRun::CheckProcess()
 
 	Log->WriteTxt("Processes checking");
 
-	// For example, get the name of the system process
+	//Query WQL for Win32_Process class content, it means processes
 	IEnumWbemClassObject* pEnumerator = NULL;
 	hres = pSvc->ExecQuery(
 		bstr_t("WQL"),
@@ -1146,6 +1163,7 @@ int CWMIRun::CheckProcess()
 	IWbemClassObject *pclsObj = NULL;
     ULONG uReturn = 0;
    
+	//enumerate processes
     while (pEnumerator)
     {
         HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
@@ -1174,7 +1192,7 @@ int CWMIRun::CheckProcess()
 
         VariantClear(&vtProp);
 
-		ProcessInfo.push_back(TempProcessInfo);
+		ProcessInfo.push_back(TempProcessInfo); // push to container
 
         pclsObj->Release();
         pclsObj = NULL;
@@ -1191,6 +1209,7 @@ int CWMIRun::CheckSys()
 
 	Log->WriteTxt("System checking");
 
+	//query WQL for info about operating system
 	IEnumWbemClassObject* pEnumerator = NULL;
 	hres = pSvc->ExecQuery(
 		bstr_t("WQL"),
@@ -1216,6 +1235,7 @@ int CWMIRun::CheckSys()
 	IWbemClassObject *pclsObj = NULL;
     ULONG uReturn = 0;
    
+	//enumerate system info structure fields
     while (pEnumerator)
     {
         HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
@@ -1294,6 +1314,7 @@ int CWMIRun::CheckDiskinfo()
 	IWbemClassObject *pclsObj = NULL;
     ULONG uReturn = 0;
    
+	//enumerate all disks stuctures
     while (pEnumerator)
     {
         HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
@@ -1301,7 +1322,7 @@ int CWMIRun::CheckDiskinfo()
 
         if(0 == uReturn)
         {
-            break;
+            break; //when reach end
         }
 
 		SDiskInfo TempDiskInfo;
@@ -1334,7 +1355,7 @@ int CWMIRun::CheckDiskinfo()
 
         VariantClear(&vtProp);
 
-		DiskInfo.push_back(TempDiskInfo);
+		DiskInfo.push_back(TempDiskInfo); //push all info to container
 
         pclsObj->Release();
         pclsObj = NULL;

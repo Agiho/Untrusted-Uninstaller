@@ -10,12 +10,12 @@ ChkPrg::~ChkPrg()
 	Free();
 }
 
-void ChkPrg::InstgertLog(CLog *TLog)
+void ChkPrg::InsertLog(CLog *TLog)
 {
 	Log = TLog;
 }
 
-void ChkPrg::InstrtWMIPointer(CWMIRun *TWMI)
+void ChkPrg::InstertWMIPointer(CWMIRun *TWMI)
 {
 	WMI = TWMI;
 }
@@ -23,6 +23,7 @@ void ChkPrg::InstrtWMIPointer(CWMIRun *TWMI)
 std::vector<CUinstPrgCont> ChkPrg::GetPrgandPath(std::string Computer, std::string User, std::string Pass)
 {
 	Free();
+	//check local registry
 	if(Computer == "local")
 	{
 		CheckAll();
@@ -30,11 +31,11 @@ std::vector<CUinstPrgCont> ChkPrg::GetPrgandPath(std::string Computer, std::stri
 	}
 	else 
 	{
+		//chacks remote registry, 32bit with API, 64bit with WMI
 		CheckAll("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall",Computer);
 		if(IsRemote64OS(Computer)) 
 		{ 
 			CheckRemote64Keys(Computer);
-			//CheckAll("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall",Computer);
 		}
 		
 	}
@@ -261,22 +262,26 @@ bool ChkPrg::IsRemote64OS(std::string SRemoteIP, std::string User, std::string P
 
 void ChkPrg::CheckRemote64Keys(std::string SRemoteIP, std::string MainKey, std::string WhichKey,std::string User, std::string Pass)
 {
+	//creating WMI object an connect to remote machine
 	CWMIRun RemoKeys;
 	RemoKeys.InsertLog(Log);
 	RemoKeys.SecPrevAdded(true);
 	RemoKeys.ConnectWMI(SRemoteIP, User, Pass, true, "\\root\\default");
+	
+	std::vector<std::string> Keys; //keys names
+	Keys = RemoKeys.GetSubKeysNames("HKEY_LOCAL_MACHINE", WhichKey); //gets all subkeys names
 
-	std::vector<std::string> Keys;
-	Keys = RemoKeys.GetSubKeysNames("HKEY_LOCAL_MACHINE", WhichKey);
-
+	//getts value from each key
 	for(int i = 0; i < Keys.size(); ++i)
 	{
+		//gets this values
 		std::string DisplayName = RemoKeys.GetSringVal("HKEY_LOCAL_MACHINE", WhichKey + Keys[i],"DisplayName");
 		std::string QuietUninstallString = RemoKeys.GetSringVal("HKEY_LOCAL_MACHINE", WhichKey + Keys[i],"QuietUninstallString");
 		std::string UninstallString = RemoKeys.GetSringVal("HKEY_LOCAL_MACHINE", WhichKey + Keys[i],"UninstallString");
 
-		if(DisplayName != "")
+		if(UninstallString != "")
 		{
+			//when UninstallString exist sets program in program stucture and adds to list
 			CUinstPrgCont TempPrg;
 			TempPrg.Add(DisplayName, UninstallString, QuietUninstallString);
 			PrgDel.push_back(TempPrg);

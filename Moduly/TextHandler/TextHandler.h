@@ -21,11 +21,10 @@ public:
 	//Deallocates memory
 	~CTextHandler();
 
+	//initialize object with font position and font size
 	void Init(SDL_Point TPos, std::string Path, unsigned int Size, CLog *TLog, SDL_Renderer *Render);
 
-	//Loads image at specified path
-	//bool loadFromFile(std::string path);
-
+	//set starting positiong of text 
 	void SetPos(SDL_Point Point);
 
 	//Creates image from font string

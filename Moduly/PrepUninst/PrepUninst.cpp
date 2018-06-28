@@ -7,6 +7,7 @@ void CPrepareUninst::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Re
 	Log = TLog;
 	Renderer = Render;
 
+	//creates window
 	Window.h = SCrH / 2;
 	Window.w = SCrW / 2 + 100;
 	Window.x = (SCrW / 2) - Window.w/2;
@@ -21,6 +22,8 @@ void CPrepareUninst::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Re
 	SDL_Color Col = { 0,0,0 };
 	TxtColor = Col;
 
+	//////////////////////////
+	//Sets button,input boxex and texts
 	SDL_Point PPos = {Position.x, Position.y};
 	Descrition.Init(PPos, Font, 15,TLog, Render);
 	Descrition.LoadFromRenderedTextUnicode(L"Niestandardowy plik odinstalowuj¹cy, proszê podaæ parametry do odinstalowania dla:", TxtColor);
@@ -40,8 +43,9 @@ void CPrepareUninst::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Re
 		TLog, Render,"","", Font);
 	Next.ChangeVis(true);
 	Next.SetCaption("Dalej");
-	BOK = true;
-	Element = 0;
+	///////////////////////////
+	BOK = true; //is all ok (when its not run first time its must be OK)
+	Element = 0; // starting element
 }
 
 void CPrepareUninst::Render()
@@ -64,16 +68,16 @@ void CPrepareUninst::HandleEvent(SDL_Event *e)
 	
 	if(!BOK)
 	{
-		Parameters.Input(e);
+		Parameters.Input(e); // handle input 
 
 		//only if button clicked returns true
 		if(Next.HandleEvent(e))
 		{
 			std::string Param = "";
-			Param = Parameters.GetText();
+			Param = Parameters.GetText(); // get parameter from user
 			if(Param == "")
 			{
-				
+				// if not exist skip program
 				++Element;
 				if( Element <  ToDo.size())
 				{
@@ -84,6 +88,7 @@ void CPrepareUninst::HandleEvent(SDL_Event *e)
 			}
 			else
 			{
+				// add parameters to uninstall string and go to next element
 				ToDo[Element].Uninsstr = ToDo[Element].Uninsstr + " " + Param;
 				ToDo[Element].StrState = UStr_OK;
 				++Element;
@@ -101,12 +106,14 @@ void CPrepareUninst::HandleEvent(SDL_Event *e)
 void CPrepareUninst::CheckPrg(std::vector<CUinstPrgCont> Cont)
 {
 	bool BStrOK = true;
+	//check is programs uninstall string OK
 	for( int i = 0; i < Cont.size(); ++i)
 	{
 		if(Cont[i].StrState == UStr_EXE)
 		{
+			//if not OK add to ToDO list
 			BStrOK = false;
-			ToDo.push_back(Cont[i]);			
+			ToDo.push_back(Cont[i]);	
 		}
 		else if(Cont[i].StrState == UStr_Unknown) 
 		{
@@ -115,12 +122,14 @@ void CPrepareUninst::CheckPrg(std::vector<CUinstPrgCont> Cont)
 		}
 		else if(Cont[i].StrState == UStr_OK)
 		{
+			//if OK add to Ready list
 			ClearStr.push_back(Cont[i]);
 			
 		}
 	}
 	if(!BStrOK)
 	{
+		//if something wrong wait for parameters
 		PrgName.LoadFromRenderedText(Cont[0].Name, TxtColor);
 		Element = 0;
 	}
@@ -135,11 +144,13 @@ std::vector<CUinstPrgCont> CPrepareUninst::GetPrg()
 	{
 		for(int i = 0; i < ToDo.size(); ++i)
 		{
+			//add OK element to ready list
 			if(ToDo[i].StrState == UStr_OK)	Prglst.push_back(ToDo[i]);
 		}
 		ToDo.erase(ToDo.begin(),ToDo.end());
 	}
 
+	//return programs list with good strings
 	ClearStr.erase(ToDo.begin(),ToDo.end());
 	Element = 0;
 	return Prglst;

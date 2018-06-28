@@ -17,9 +17,10 @@ public:
 	~ChkPrg();
 
 	//takes log file
-	void InstgertLog(CLog *TLog);
+	void InsertLog(CLog *TLog);
 
-	void InstrtWMIPointer(CWMIRun *TWMI);
+	// akes pointer to WMI object for use it in class
+	void InstertWMIPointer(CWMIRun *TWMI);
 
 	//return program name and path to uninstall it
 	std::vector<CUinstPrgCont> GetPrgandPath(std::string Computer = "local", std::string User = "", std::string Pass = "");
@@ -30,13 +31,14 @@ private:
 
 	CWMIRun *WMI;
 
+	// const value for use in arrays
 	static const unsigned short int MAX_KEY_LENGTH  = 255;
 	static const unsigned short int MAX_VALUE_NAME_LENGHT = 16383;
 
 	//holds program names and path to uninstallation
 	std::vector<CUinstPrgCont> PrgDel;
 
-
+	// query registry key for data and place it in PrgDel
 	void QueryKey(HKEY hKey);
 
 	//loads DisplayName and UninstallString for programs to map

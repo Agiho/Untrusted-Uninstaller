@@ -14,7 +14,7 @@ int CUinstPrgCont::Add(std::string TName, std::string Uninst, std::string QUnins
 		return UStr_OK;
 	}
 
-	std::transform(Uninst.begin(), Uninst.end(), Uninst.begin(), ::tolower);
+	std::transform(Uninst.begin(), Uninst.end(), Uninst.begin(), ::tolower); //change all character to lower
 	
 	//checks is it msiexec path
 	if(Uninst.find("msiexec") != std::string::npos)
@@ -33,6 +33,8 @@ int CUinstPrgCont::Add(std::string TName, std::string Uninst, std::string QUnins
 		StrState = UStr_EXE;
 		return UStr_EXE;
 	}
+
+	//when its something else
 	StrState = UStr_Unknown;
 	return UStr_Unknown;
 }

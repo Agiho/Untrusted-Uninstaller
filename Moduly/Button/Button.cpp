@@ -61,6 +61,7 @@ void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TBu
 		RClips[i].h = IHeight;
 	}
 
+	// font initializations and position setting
 	FontInit = false;
 	if (FontPath != "")
 	{	
@@ -231,10 +232,12 @@ void CButton::ChangeVis(bool BVis)
 {
 	BVisible = BVis;
 }
+
 bool CButton::ChangeVis()
 {
 	return BVisible = !BVisible;
 }
+
 bool CButton::GetVis()
 {
 	return BVisible;

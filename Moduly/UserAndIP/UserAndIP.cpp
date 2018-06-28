@@ -6,11 +6,13 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 	Log = TLog;
 	Renderer = Render;
 
+	//sets window position
 	Window.h = SCrH / 2;
 	Window.w = SCrW / 2;
 	Window.x = (SCrW / 2) - Window.w/2;
 	Window.y = (SCrH / 2) - Window.h/2;
 
+	// sets tesxboxes
 	SDL_Rect Position;
 	int TxtHeight = 20;
 	Position.x = Window.x + (Window.w / 4);
@@ -44,6 +46,7 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 	PassDescrip.Init(PPos,Font, 15, TLog, Render);
 	PassDescrip.LoadFromRenderedTextUnicode(L"Has³o:", Col);
 
+	//set button
 	Position.y = Position.y + TxtHeight + 10;
 	LogIn.Init((Position.x + (Position.w / 2)) - PosButTex.w / 2, Position.y, PosButTex.w, PosButTex.h, TTexture, PosButTex.x, PosButTex.y,
 		TLog, Render,"","", Font);
@@ -53,19 +56,23 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 
 void CUserAndIP::Render()
 {
+	//Window
 	SDL_SetRenderDrawColor(Renderer, 222, 255, 255, 0); // white
 	SDL_RenderFillRect(Renderer, &Window); //render filled rect
 	SDL_SetRenderDrawColor(Renderer, 0x00, 0x00, 0x00, 0); //black
 	SDL_RenderDrawRect(Renderer, &Window); //border
 
+	//texts
 	IPDescrip.Render();
 	UserDescrip.Render();
 	PassDescrip.Render();
 
+	//inputboxes
 	IP.Render();
 	User.Render();
 	Password.Render();
 
+	//button
 	LogIn.Render();
 
 }

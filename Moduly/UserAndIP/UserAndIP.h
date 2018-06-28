@@ -13,11 +13,14 @@ class CUserAndIP
 
 public:
 
+	// initialize window with input boxes and button
 	void Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Renderer *Render, SDL_Rect Posbyttex,
 		unsigned int SCrW,  unsigned int SCrH, std::string Font);
 
+	//render window
 	void Render();
 
+	//input handling, returns true when login button is pressed
 	bool HandleEvent(SDL_Event *e);
 
 	// returns info contained in boxes

@@ -14,17 +14,23 @@ class CPrgSelector
 
 public:
 
+	//initializes main window with programs and computers lists
 	void Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned int ScrH ,SDL_Renderer *Render,  std::vector<CUinstPrgCont> *Programslst, std::string FontPath,
 	std::shared_ptr<CTexture> FirstSlid, std::shared_ptr<CTexture> SecondSlid, std::shared_ptr<CTexture> StdButton);
 
+	// set text where program is curently connected
 	void SetWhereConnected(std::string Name);
 
+	// update functions for object that need it
 	void Update();
 
+	//handle events in main window
 	void HandleEvent(SDL_Event *e);
 
+	// render everything
 	void Render();
 
+	//set new program list to uninstallation
 	void SetPrg(std::vector<CUinstPrgCont> *Prg);
 
 private:

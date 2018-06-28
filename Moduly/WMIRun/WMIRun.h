@@ -136,6 +136,7 @@ private:
 	UINT PID; //process ID
 	UINT ReturnVal; //returned value
 
+	//informations about disks, processes and system
 	std::vector<SDiskInfo> DiskInfo;
 	std::vector<SProcessInfo> ProcessInfo;
 	SSysInfo SysInfo;

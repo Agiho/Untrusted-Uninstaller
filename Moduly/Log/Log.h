@@ -27,10 +27,13 @@ public:
 
 private:
 
+	//object for managing file
 	CFile Log;
 
+	//path to file
 	std::string LogPath;
 
+	//stream for conversions
 	std::stringstream Stream;
 };
 #endif

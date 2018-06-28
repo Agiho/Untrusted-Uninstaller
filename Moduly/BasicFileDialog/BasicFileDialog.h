@@ -20,8 +20,10 @@ class CBasicFileDialog
 { 
 public:
 
+	//Opens  window dialog for openning file
 	void CreateOpenFileDialog(HWND hWnd, LPCSTR Title, LPCSTR InitialDirectory, LPCSTR Filter, int FilterIndex);
 
+	//return path to file
 	const char* ReturnLastPath();
 
 private:

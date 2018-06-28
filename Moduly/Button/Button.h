@@ -14,6 +14,7 @@
 class CButton
 {
 public:
+
 	CButton(/*SDL_Renderer* Render,  CLog *TLog */);
 	~CButton();
 
@@ -54,6 +55,7 @@ public:
 	void ChangeVis(bool BVis);
 	bool ChangeVis();
 	bool GetVis();
+
 
 private:
 	

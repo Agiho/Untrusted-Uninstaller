@@ -15,22 +15,31 @@ class CCheckBoxCont
 
 public:
 
+	//sets position and create empty boxes for values in WhatContains and slider for it
 	void Init(CLog *TLog, SDL_Rect Pos, unsigned int SliderSize, unsigned int WinW, unsigned int WintH, SDL_Renderer *Renderer, std::vector<T> *WhatContains, std::string FontPath, std::shared_ptr<CTexture> SliderTex);
 
+	//render everything
 	void Render();
 
+	//handle event for slider and checkboxes
 	void HandleEvent(SDL_Event *e);
 
+	//returns checked programs
 	std::vector<T> GetChk();
 
+	// sets new list to checkbox
 	void SetNewList(std::vector<T> *PNewrg);
 
+	//returns nr of checked checkboxes
 	unsigned int Checked();
 
+	// reset ner of checked
 	unsigned int CCheckBoxCont<T>::ResetChecked();
 
+	// returns all contained programs
 	std::vector<T>* GetAll();
 
+	//add one object to list
 	void AddNewOne(T New);
 
 private:
@@ -38,9 +47,9 @@ private:
 	CLog * Log;
 	SDL_Renderer *Renderer;
 
-	unsigned int INrChecked;
+	unsigned int INrChecked; //nr of checked i container
 
-	unsigned int CurrentLine;
+	unsigned int CurrentLine; // which line ist first to render
 
 	unsigned int WinWidth, WinHeight; //Window size
 
@@ -50,7 +59,7 @@ private:
 
 	CSlider Slider;
 
-	std::vector<CTextHandler> Names;
+	std::vector<CTextHandler> Names; // text to render next to checkbox
 
 	std::vector<T> *Content; //program and uninstall paths list
 
@@ -69,6 +78,8 @@ void CCheckBoxCont<T>::Init(CLog *TLog, SDL_Rect Pos, unsigned int SliderSize, u
 
 	int i = 0;
 	bool Exit = false;
+
+	// creating checkboxes and space for text
 	while (!Exit)
 	{
 		// filled rectangle 
@@ -86,6 +97,7 @@ void CCheckBoxCont<T>::Init(CLog *TLog, SDL_Rect Pos, unsigned int SliderSize, u
 
 	CurrentLine = 0;
 
+	//creating slider setting position and give him maxvalue
 	Slider.Init(TLog, (Frame.x + Frame.w), Frame.y, SliderSize, Frame.h, SliderSize, SliderSize, SliderSize, SliderSize, SliderTex, 0, 0, Render);
 	Slider.ChangeVis(true);
 	if(!(*Content).empty())
@@ -93,6 +105,7 @@ void CCheckBoxCont<T>::Init(CLog *TLog, SDL_Rect Pos, unsigned int SliderSize, u
 	Slider.SetMaxVal((*Content).size() - Names.size());
 	}
 	else Slider.SetMaxVal(0);
+
 	//checking how many is already checked
 	INrChecked = 0;
 	if(!((*Content).empty()))
@@ -107,7 +120,7 @@ void CCheckBoxCont<T>::Init(CLog *TLog, SDL_Rect Pos, unsigned int SliderSize, u
 template <class T>
 void CCheckBoxCont<T>::Render()
 {
-
+	//render space for checkboxes
 	SDL_SetRenderDrawColor(Renderer, 0xFF, 0xFF, 0xFF, 0xFF); // white
 	SDL_RenderFillRect(Renderer, &Frame); //render filled rect
 	SDL_SetRenderDrawColor(Renderer, 0x00, 0x00, 0x00, 0xFF); //black
@@ -119,6 +132,7 @@ void CCheckBoxCont<T>::Render()
 	{
 		for (int SqrI = 0; SqrI < Sqrs.size(); ++SqrI)
 		{
+			//checkboxes render
 			if(i < (*Content).size())
 			{
 				if((*Content)[i].BChecked)
@@ -135,7 +149,7 @@ void CCheckBoxCont<T>::Render()
 				SDL_SetRenderDrawColor(Renderer, 0x00, 0x00, 0x00, 0xFF); //black
 				SDL_RenderDrawRect(Renderer, &Sqrs[SqrI]); //border
 
-														   //render program name
+				//render program name
 				SDL_Color Col = { 0,0,0 };
 				Names[SqrI].LoadFromRenderedText((*Content)[i].Name, Col);
 				Names[SqrI].Render();
@@ -143,6 +157,8 @@ void CCheckBoxCont<T>::Render()
 			++i;
 		}
 	}
+
+	//Render slider
 	Slider.Render();
 }
 
@@ -204,6 +220,7 @@ void CCheckBoxCont<T>::HandleEvent(SDL_Event *e)
 					//When button is checkbox
 				case SDL_MOUSEBUTTONDOWN:
 
+					//checking and unchecking checkboxes
 					if(CurrentLine + i < (*Content).size())
 					{
 						if((*Content)[CurrentLine + i].BChecked)
@@ -224,6 +241,7 @@ void CCheckBoxCont<T>::HandleEvent(SDL_Event *e)
 		}
 
 	}
+	//update slider with currentline value;
 	Slider.Update(CurrentLine);
 }
 
@@ -231,6 +249,7 @@ template <class T>
 std::vector<T> CCheckBoxCont<T>::GetChk()
 {
 	std::vector<T> Return;
+	//checking all objects for checked object
 	for (int i = 0; i < (*Content).size(); ++i)
 	{
 		if ((*Content)[i].BChecked) Return.push_back(((*Content)[i]));
@@ -241,6 +260,7 @@ std::vector<T> CCheckBoxCont<T>::GetChk()
 template <class T>
 void CCheckBoxCont<T>::SetNewList(std::vector<T> *New)
 {
+	// adds new objects list to vector and change max value for slider
 	Content = New;
 	int Help =((*Content).size() - Names.size());
 	if(0 < Help )Slider.SetMaxVal((*Content).size() - Names.size());
@@ -268,6 +288,7 @@ std::vector<T>* CCheckBoxCont<T>::GetAll()
 template <class T>
 void CCheckBoxCont<T>::AddNewOne(T New)
 {
+	// adds new object to vector and change max value for slider
 	(*Content).push_back(New);
 	int Help =((*Content).size() - Names.size());
 	if(0 < Help )Slider.SetMaxVal((*Content).size() - Names.size());

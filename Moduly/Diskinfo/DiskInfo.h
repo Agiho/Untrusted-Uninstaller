@@ -2,14 +2,14 @@
 
 struct SDiskInfo
 {
-	std::string Name;
+	std::string Name; // disk name
 
-	std::string Caption;
+	std::string Caption; // disk letter
 
-	unsigned int FreeSpace;
+	unsigned int FreeSpace; // free space on it
 
-	unsigned int DriveType;
+	unsigned int DriveType; // drivetype
 
-	unsigned int LastError;
+	unsigned int LastError; // last error on disk
 
 };

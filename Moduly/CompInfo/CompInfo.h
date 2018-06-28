@@ -8,7 +8,7 @@ struct SCompInfo
 {
 	std::string Name; //computer name or IP adress
 
-	bool BChecked;
+	bool BChecked;  // when true, in checkbox container it be checked
 
 };
 

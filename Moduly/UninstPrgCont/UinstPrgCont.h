@@ -18,17 +18,18 @@ class CUinstPrgCont
 {
 public:
 
+	// fills values in class
 	int Add(std::string TName, std::string Uninst, std::string QUninst);
 
 private:
 
-	std::string Name;
+	std::string Name; //program name
 
-	std::string Uninsstr;
+	std::string Uninsstr; //Uninstall string
 
-	UStrState StrState;
+	UStrState StrState; // string stae, if OK uninstal string can used to uninstall
 
-	bool BChecked;
+	bool BChecked; //is checked
 
 	//firend declaration
 	friend class CPrepareUninst;

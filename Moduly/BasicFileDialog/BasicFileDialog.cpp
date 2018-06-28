@@ -3,6 +3,8 @@
 
 void CBasicFileDialog::CreateOpenFileDialog(HWND hWnd, LPCSTR Title, LPCSTR InitialDirectory, LPCSTR Filter, int FilterIndex)
 	{
+
+		//OPENFILENAME structure
 		OPENFILENAME ofn;
    
 		ZeroMemory(&ofn, sizeof(ofn));
@@ -18,6 +20,7 @@ void CBasicFileDialog::CreateOpenFileDialog(HWND hWnd, LPCSTR Title, LPCSTR Init
 		ofn.lpstrFileTitle = NULL;
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
+		//opens window and take path to file
 		if (GetOpenFileName(&ofn))
 		{
 			 result = ofn.lpstrFile;
@@ -30,6 +33,7 @@ void CBasicFileDialog::CreateOpenFileDialog(HWND hWnd, LPCSTR Title, LPCSTR Init
 
 const char* CBasicFileDialog::ReturnLastPath()
 {
+	//returns path if its not empty
 	if (result == NULL)return "Empty";
 	else return result;
 }

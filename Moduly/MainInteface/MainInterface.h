@@ -22,18 +22,24 @@ class CMainInterface
 
 public:
 
+	//initialize interface, sets positions and initiates buttons
 	void Init(CLog *TLog, ChkPrg *TChecker, CWMIRun *WMI, SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath);
 
+	//render interface
 	void Render();
 
+	//runs update functions for class which need it 
 	void Update();
 
+	// handle events in all program
 	void HandleEvent(SDL_Event *e);
 
+	// returns true need quit program
 	bool IsQuit();
 
 private:
 
+	// states in maininterface to render and handle
 	enum Phases {
 
 		LOCALCH = 0,

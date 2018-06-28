@@ -2,10 +2,10 @@
 
 struct SProcessInfo
 {
-	unsigned int PID;
+	unsigned int PID; //process ID
 
-	unsigned int SID;
+	unsigned int SID; //user session ID 
 
-	std::string Name;
+	std::string Name;// process name
 
 };
