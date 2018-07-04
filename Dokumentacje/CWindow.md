@@ -10,4 +10,3 @@ Klasa przechowuje wskaźnik do okna i renderera. Odpowiada zautworzenie okna i i
 | `void ClearScr(Uint8 r = 0xff, Uint8 g = 0xff,  Uint8 b = 0xff, Uint8 a = 0xff)` | ***Czyści ekran i  zmienia go na kolor podany w argumentach*** (domyślnie białe) |
 | `void UpdateScr()`                       | ***Odświeża okno,  dzięki temu zmiany z renderera mogą się wyświetlić.*** |
 | `SDL_Renderer* GetRenderer()`            | ***Zwraca wskaźnik do utworzonego Renderera*** |
-
