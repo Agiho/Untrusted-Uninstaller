@@ -1,4 +1,4 @@
-## **CGameTextures**
+## **CTexturesMgr**
 
 Klasa przechowująca tekstury dla obietków i zwracająca wskaźniki do odpowiedniej na ich prośbę
 

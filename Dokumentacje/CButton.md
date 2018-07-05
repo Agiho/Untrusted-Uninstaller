@@ -13,6 +13,13 @@ Klasa do zarządzania przyciskiem, tworzy przycisk i sprawdza czyzostała wykona
 | `int GetWidth()`                         | ***Zwraca szerokość  przycisku***        |
 | `void SoundOn()`                         | ***Odtwarza dźwięk  przypisany do tego przy podświetleniu*** |
 | `void SoundDown()`                       | ***Odtwarza dźwięk  przypisany do tego przy przyciśnięciu*** |
+| `void SetCaption(std::string Cap)`       | ***Pozwala ustawic napis na przycisku*** **Argument:** napis do wyświetlenia |
+| `std::string GetCaption()`               | ***zwraca obecny napis na przycisku***   |
 | `void StateOut()`                        | ***Zmienia stan  przycisku na taki gdy nie znajduje się nad nim myszka*** |
 | `void StateOn()`                         | ***Zmienia stan  przycisku na taki gdy myszka jest nad*** |
 | `void StateDown()`                       | ***Zmienia stan  przycisku na taki gdy zostaje wciśnięty*** |
+| `void Active(bool active)`               | ***Aktywuje/dezakywuje przycisk*** **argument:** wartość czy ma być aktywny |
+| `bool IsActive()`                        | ***Pozwala sprawdzić czy przycisk jest aktywny*** |
+| `void ChangeVis(bool BVis)`              | ***Zmienia stan widoczności przycisku*** **Argument:** wartość czy ma byc widoczny |
+| `bool ChangeVis()`                       | ***Zmienia stan widoczności przycisku na przeciwny do obecnego i zwraca obecny stan*** |
+| `bool GetVis()`                          | ***Zwraca informację czy przycisk jest obecnie widoczny*** |
