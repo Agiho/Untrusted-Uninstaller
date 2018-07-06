@@ -167,6 +167,8 @@ void CPrgSelector::SetPrg(std::vector<CUinstPrgCont> *Prg)
 	//adds new program list
 	BRenderPrg = true;
 	Uninstlst = Prg;
+	
+	std::sort (Prg->begin() , Prg->end());
 	PrgChkBox.SetNewList(Prg);
 }
 

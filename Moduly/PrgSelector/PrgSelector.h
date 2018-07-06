@@ -1,6 +1,7 @@
 #ifndef PrgSelector_h
 #define PrgSelector_h
 
+#include <algorithm>
 #include "ChkPrg.h"
 #include "CompInfo.h"
 #include "TCheckBoxCont.h"

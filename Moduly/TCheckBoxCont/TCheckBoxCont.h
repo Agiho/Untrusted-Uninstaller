@@ -34,7 +34,7 @@ public:
 	unsigned int Checked();
 
 	// reset ner of checked
-	unsigned int CCheckBoxCont<T>::ResetChecked();
+	unsigned int ResetChecked();
 
 	// returns all contained programs
 	std::vector<T>* GetAll();
@@ -182,6 +182,7 @@ void CCheckBoxCont<T>::HandleEvent(SDL_Event *e)
 
 			//Check if mouse is inside checkbox
 			bool BInside = true;
+
 			//Mouse is left of the checkbox
 			if (X < Sqrs[i].x)
 			{
@@ -241,6 +242,59 @@ void CCheckBoxCont<T>::HandleEvent(SDL_Event *e)
 		}
 
 	}
+
+	//scroling with mouse wheel
+	if(e->type == SDL_MOUSEWHEEL)
+	{
+		int X, Y;
+		SDL_GetMouseState(&X, &Y);
+
+		//Check if mouse is inside box
+		bool BInside = true;
+
+		//Mouse is left of the box
+		if (X < Frame.x)
+		{
+			BInside = false;
+		}
+		//Mouse is right of the box
+		else if (X > Frame.x + Frame.w)
+		{
+			BInside = false;
+		}
+		//Mouse above the box
+		else if (Y < Frame.y)
+		{
+			BInside = false;
+		}
+		//Mouse below the box
+		else if (Y > Frame.y + Frame.h)
+		{
+			BInside = false;
+		}
+		//Mouse is outside box
+		if (!BInside)
+		{
+
+		}
+		//Mouse is inside kbox
+		else
+		{
+			if(e->wheel.y > 0) // scroll up
+			{
+				int Val = Slider.GetCurValue() - 1;
+				if (Val >= 0) Slider.SetVal(Val);
+			}
+			else if(e->wheel.y < 0) // scroll down
+			{
+				int Val = Slider.GetCurValue() + 1;
+				if (Slider.GetMaxVal() >= Val) Slider.SetVal(Val);
+			}
+
+		}
+	}
+
+
 	//update slider with currentline value;
 	Slider.Update(CurrentLine);
 }

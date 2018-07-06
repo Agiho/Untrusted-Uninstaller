@@ -1,4 +1,4 @@
-## **CWMIRun**
+﻿## **CWMIRun**
 
 Klasa która [pozwala na podłączenie się do lokalnego lub dostępnego w sieci komputera za pośrednictwem WMI i wywołuje jej instrukcje
 
@@ -21,4 +21,4 @@ Klasa która [pozwala na podłączenie się do lokalnego lub dostępnego w sieci
 | `std::vector<std::string> GetSubKeysNames(std::string MainKey,std::string SKey)` | ***zwraca vector nazw podkluczy we wskazanym kluczu*** **Argument 1:** Główny klucz np. "HKEY_LOCAL_MACHINE" **Argument 2:** podklucz w którym będą wyszukiwane nazwy podkluczy |
 | `std::string GetSringVal(std::string MainKey,std::string SKey,std::string ValName)` | ***Zwraca warotść string z podanej wartości w kluczu*** **argument 1:** Główny klucz np. "HKEY_LOCAL_MACHINE" **Argument 2:** podklucz z którego bedą pobierane wartości **Argument 3:** Nazwa wartości której wartość string ma być zwrócona |
 | `void EndWait()`                         | ***Kończy oczekiwanie na zakończenie procesu*** |
-| `void Free()1                            | *** rozłącza ze stacją , zwalnia zajmowaną pamięć na komputerze w którym są uruchamiane funkcje WMI | 
+| `void Free()`                            | ***rozłącza ze stacją , zwalnia zajmowaną pamięć na komputerze w którym są uruchamiane funkcje WMI*** | 

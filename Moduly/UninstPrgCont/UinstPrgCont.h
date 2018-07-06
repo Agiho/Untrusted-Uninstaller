@@ -20,10 +20,14 @@ public:
 
 	// fills values in class
 	int Add(std::string TName, std::string Uninst, std::string QUninst);
+	
+	//operator function
+	bool operator<(const CUinstPrgCont &q) { return Name < q.Name; }
 
 private:
 
-	std::string Name; //program name
+	//program name
+	std::string Name;
 
 	std::string Uninsstr; //Uninstall string
 
@@ -36,6 +40,9 @@ private:
 	friend class CPrgSelector;
 	template <typename T> friend class CCheckBoxCont;
 
+	
+
+	
 };
 
 #endif
