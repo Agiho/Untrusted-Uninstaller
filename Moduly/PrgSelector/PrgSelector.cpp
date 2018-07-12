@@ -69,6 +69,29 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	butpos.w = 100;
 	butpos.h = 50;
 	WPrepUninst.Init(TLog, StdButton, Render, butpos, ScrW, ScrH, FontPath);
+
+	//messagebox
+
+	SDL_MessageBoxColorScheme colorScheme = 
+	{
+		{ /* .colors (.r, .g, .b) */
+			/* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+			{ 222,   255,   255 },
+			/* [SDL_MESSAGEBOX_COLOR_TEXT] */
+			{   0, 255,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+			{ 255, 255,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+			{   200,  255, 255 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+			{ 255,   0, 255 }
+		}
+	};
+	
+	//message box
+	MsgYesNo.IstertLog(TLog);
+	MsgYesNo.MakeYesNo();
+	
 }
 
 void CPrgSelector::SetWhereConnected(std::string Name)
@@ -123,9 +146,12 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 		}
 		if(Begin.HandleEvent(e)) //begin button clicked
 		{
-			WPrepUninst.CheckPrg(PrgChkBox.GetChk()); //check that programs sings are correct
-			if(WPrepUninst.AllOK()) BeginUninstall(WPrepUninst.GetPrg()); //if ok begin uninsall			
-			else BNeedPrepare = true; //if not need prepare it
+			if(MsgYesNo.ShowMsg("Odinstalowywanie Oprogramowania", "Czy na pewno chcesz by te programy odinstalowano?") == 1)
+			{
+				WPrepUninst.CheckPrg(PrgChkBox.GetChk()); //check that programs sings are correct
+				if(WPrepUninst.AllOK()) BeginUninstall(WPrepUninst.GetPrg()); //if ok begin uninsall			
+				else BNeedPrepare = true; //if not need prepare it
+			}
 		}
 
 		IPBox.Input(e); //input to inputbox
@@ -210,10 +236,21 @@ void CPrgSelector::BeginUninstall(std::vector<CUinstPrgCont> Uninstall)
 {
 	if(!(Uninstall.empty())) //if there is programs to uninstall
 	{
-		//execute every uninstallsring
-		for(int i = 0 ; i < Uninstall.size(); ++i)
+		if(Uninstall.size() == 1)
 		{
-			WMI->ExecMethod(Uninstall[i].Uninsstr);
+			WMI->ExecMethod(Uninstall[0].Uninsstr);
+		}
+		else
+		{
+			//execute every uninstallsring
+			for(int i = 0 ; i < Uninstall.size(); ++i)
+			{
+				WMI->ExecMethod(Uninstall[i].Uninsstr);
+				WMI->WaitExeEnd(WMI->GetLastPID());
+				while(!(WMI->IsProcessDead()))
+				{
+				}
+			}
 		}
 		std::vector<CUinstPrgCont> TempCont;
 		//remove checked program from the list

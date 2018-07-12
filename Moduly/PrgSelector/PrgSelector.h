@@ -9,6 +9,7 @@
 #include "BasicFileDialog.h"
 #include "PrepUninst.h"
 #include "ChkPrg.h"
+#include "MsgBox.h"
 
 class CPrgSelector
 {
@@ -67,6 +68,9 @@ private:
 	CButton Plus;
 	CButton FromFile;
 	CButton Begin;
+
+	//messagebox
+	CMsgBox MsgYesNo;
 
 	//need prepare some installations
 	bool BNeedPrepare;
