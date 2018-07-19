@@ -57,7 +57,7 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 void CUserAndIP::Render()
 {
 	//Window
-	SDL_SetRenderDrawColor(Renderer, 222, 255, 255, 0); // white
+	SDL_SetRenderDrawColor(Renderer, 222, 255, 255, 0); // color
 	SDL_RenderFillRect(Renderer, &Window); //render filled rect
 	SDL_SetRenderDrawColor(Renderer, 0x00, 0x00, 0x00, 0); //black
 	SDL_RenderDrawRect(Renderer, &Window); //border

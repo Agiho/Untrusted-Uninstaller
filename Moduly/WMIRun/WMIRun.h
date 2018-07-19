@@ -82,6 +82,15 @@ public:
 	std::vector<std::string> GetSubKeysNames(std::string MainKey,std::string SKey);//returns list of subkeys name in registry branch //Main Key value axample: "HKEY_LOCAL_MACHINE"
 	std::string GetSringVal(std::string MainKey,std::string SKey,std::string ValName); // returns string contained in value if ValName have vaalue type string    
 
+	//returns last started program process ID
+	UINT GetLastPID();
+
+	//return last value from connecting WMI
+	UINT GetLatReturnWMIVal();
+
+	//returns there WMI is connected
+	std::string Getloc();
+
 	//end waiting
 	void EndWait();
 

@@ -747,6 +747,7 @@ int CWMIRun::WaitExeEnd(UINT ID)
 		Mystream.clear();
 		Log->WriteTxt(Mystream.str());   
         //throw std::exception("CreationEvent initialization failed");
+		return 1;
     }
 
 	return 0;
@@ -968,7 +969,7 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 {
 	BSTR MethodName = SysAllocString(L"GetStringValue"); //function
 
-	BSTR ClassName = SysAllocString(L"StdRegProv"); /class
+	BSTR ClassName = SysAllocString(L"StdRegProv"); //class
 
 
 	BSTR ArgName1 = SysAllocString(L"hDefKey"); //argument 1 name
@@ -1089,6 +1090,21 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	  }
     } 
 
+}
+
+UINT CWMIRun::GetLastPID()
+{
+	return PID;
+}
+
+UINT CWMIRun::GetLatReturnWMIVal()
+{
+	return ReturnVal;
+}
+
+std::string CWMIRun::Getloc()
+{
+	return localization;
 }
 
 void CWMIRun::EndWait()

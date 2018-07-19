@@ -47,7 +47,6 @@ private:
 	SDL_Rect Window;
 
 	CButton LogIn;
-
 };
 
 #endif

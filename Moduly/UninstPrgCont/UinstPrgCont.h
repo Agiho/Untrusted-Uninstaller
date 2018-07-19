@@ -38,10 +38,8 @@ private:
 	//firend declaration
 	friend class CPrepareUninst;
 	friend class CPrgSelector;
+	friend class CUninstMgr;
 	template <typename T> friend class CCheckBoxCont;
-
-	
-
 	
 };
 
