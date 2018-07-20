@@ -86,6 +86,16 @@ void CSlider::SetVal(unsigned int Val)
 	CurValue = Val / OverSizeJump;
 }
 
+void CSlider::LessOneVal()
+{
+	if (CurValue) --CurValue;
+}
+
+void CSlider::MoreOneVal()
+{
+	if (CurValue * OverSizeJump < MaxValue) ++CurValue;
+}
+
 void CSlider::Render()
 {
 	if (BVisible)
@@ -110,11 +120,11 @@ void CSlider::HandleEvent(SDL_Event *e)
 	{
 		if (Less.HandleEvent(e))
 		{
-			if (CurValue) --CurValue;
+			LessOneVal();
 		}
 		if (More.HandleEvent(e))
 		{
-			if (CurValue < MaxValue) ++CurValue;
+			MoreOneVal();
 		}
 		if (Slider.HandleEvent(e))
 		{

@@ -282,13 +282,13 @@ void CCheckBoxCont<T>::HandleEvent(SDL_Event *e)
 		{
 			if(e->wheel.y > 0) // scroll up
 			{
-				int Val = Slider.GetCurValue() - 1;
-				if (Val >= 0) Slider.SetVal(Val);
+				Slider.LessOneVal();
+				CurrentLine = Slider.GetCurValue();
 			}
 			else if(e->wheel.y < 0) // scroll down
 			{
-				int Val = Slider.GetCurValue() + 1;
-				if (Slider.GetMaxVal() >= Val) Slider.SetVal(Val);
+				Slider.MoreOneVal();
+				CurrentLine = Slider.GetCurValue();
 			}
 
 		}

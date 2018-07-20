@@ -42,7 +42,7 @@ std::vector<CUinstPrgCont> ChkPrg::GetPrgandPath(std::string Computer, std::stri
 	return PrgDel;
 }
 
-void ChkPrg::QueryKey(HKEY hKey)
+void ChkPrg::QueryKey(HKEY hKey, std::string CurrentKey)
 {
 	TCHAR    achKey[MAX_KEY_LENGTH];   // buffer for subkey name
     DWORD    cbName;                   // size of name string 
@@ -78,11 +78,12 @@ void ChkPrg::QueryKey(HKEY hKey)
         &ftLastWriteTime);       // last write time 
  
     // Enumerate the subkeys, until RegEnumKeyEx fails.
-    
+ 
     if (cSubKeys)
     {
 		 for (i=0; i<cSubKeys; i++) 
 		{
+			
 				 cbName = MAX_KEY_LENGTH;
 				retCode = RegEnumKeyEx(hKey, i,
 				achKey, 
@@ -91,7 +92,7 @@ void ChkPrg::QueryKey(HKEY hKey)
 				NULL, 
 				NULL, 
 				&ftLastWriteTime); 
-
+				
 				//no error
 			if (retCode == ERROR_SUCCESS) 
 			{
@@ -100,8 +101,10 @@ void ChkPrg::QueryKey(HKEY hKey)
 				achKey,
 				0, KEY_READ,
 				&subKey);				
-				if(retCode == ERROR_SUCCESS) QueryKey(subKey);
+				if(retCode == ERROR_SUCCESS) QueryKey(subKey, achKey);
 				else Log->WriteTxt("Can't open registry key\n");
+				//CatchKey = achKey;
+				//Log->WriteTxt(CatchKey);
 			}
 			else Log->WriteTxt("Can't open registry key\n");
 		}
@@ -155,6 +158,12 @@ void ChkPrg::QueryKey(HKEY hKey)
 				}
             } 
         }
+		//LibreOffice fix, (In LibreOffice 4 and 5 value UninstallString don't exist) 
+		if((STempName.find("LibreOffice") !=std::string::npos) || (STempName.find("OpenOffice") !=std::string::npos))
+		{
+			STempPath = "msiexec /x " + CurrentKey; // add key name and create uninstall string
+		}
+
 		//Add Program to container
 		if (STempPath != "")
 		{			
@@ -279,6 +288,11 @@ void ChkPrg::CheckRemote64Keys(std::string SRemoteIP, std::string MainKey, std::
 		std::string QuietUninstallString = RemoKeys.GetSringVal("HKEY_LOCAL_MACHINE", WhichKey + Keys[i],"QuietUninstallString");
 		std::string UninstallString = RemoKeys.GetSringVal("HKEY_LOCAL_MACHINE", WhichKey + Keys[i],"UninstallString");
 
+		//LibreOffice fix, (In LibreOffice 4 and 5 value UninstallString don't exist) 
+		if((DisplayName.find("LibreOffice") != std::string::npos) || (DisplayName.find("OpenOffice") != std::string::npos) )
+		{
+			UninstallString = "msiexec /x " + Keys[i]; // add key name and create uninstall string
+		}
 		if(UninstallString != "")
 		{
 			//when UninstallString exist sets program in program stucture and adds to list

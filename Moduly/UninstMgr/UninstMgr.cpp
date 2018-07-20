@@ -25,29 +25,33 @@ void CUninstMgr::AddCred(std::string TUser, std::string SPass)
 void CUninstMgr::StartUninstall(std::vector<std::string> Where, std::vector<CUinstPrgCont> TUninstlst)
 {
 
-	Uninstlst = TUninstlst;
+	Uninstlst = TUninstlst; // copy uninstall paths
 	
+	//create WMI object fo each computer and start first uninstall process, and try to start wait for process end function 
 	for(int i = 0; i < Where.size(); ++i)
 	{
 	
 		CWMIRun *WMI = new CWMIRun;
 		WMI->InsertLog(Log);
-		WMI->SecPrevAdded(true);
-		WMI->ConnectWMI(Where[i],User, Pass);
+		WMI->SecPrevAdded(true); //there shoudl always exist WMI object which connect somewhere before using this class
+		WMI->ConnectWMI(Where[i],User, Pass); //connect
 		if(!TUninstlst.empty()) 
 		{
+			//create info object about uninstall processes on this computer
 			std::pair<int, bool> AboutWMIObj;
 			AboutWMIObj.first = 0;
 			AboutWMIObj.second = false;
+
 			bool BCanWait = true;
-			WMI->ExecMethod(TUninstlst[0].Uninsstr);
-			if(WMI->WaitExeEnd(WMI->GetLastPID()) == 2)
+			WMI->ExecMethod(TUninstlst[0].Uninsstr); //execute method
+			if(WMI->WaitExeEnd(WMI->GetLastPID()) == 2) //try to start wait function
 			{
 				InfoMsg.ShowMsg("Problem z oczekiwaniem na koniec procesu", "Na komputerze: " + Where[i] + " jest dozwolone jedynie odinstalowywanie oprogramowania po jednym na raz.");
 				BCanWait = false;
 				WMI->EndWait();
 			}
 
+			//pushes information object and WMI object for each computer to containers
 			CanWait.push_back(BCanWait);
 			WMIobj.push_back(std::unique_ptr<CWMIRun>(WMI));
 			About.push_back(AboutWMIObj);
@@ -58,29 +62,28 @@ void CUninstMgr::StartUninstall(std::vector<std::string> Where, std::vector<CUin
 
 void CUninstMgr::Update()
 {
-	if(!WMIobj.empty())
+	if(!WMIobj.empty()) //if there exist objects
 	{
 
 		for(int i = 0; i < WMIobj.size(); ++i)
 		{
-			if(CanWait[i])
+			if(CanWait[i]) //if object can wait for end
 			{
-				if(WMIobj[i]->IsProcessDead() && !About[i].second)
+				if(WMIobj[i]->IsProcessDead() && !About[i].second) //if last process is dead and its not last process
 				{
-					if(About[i].first + 1 < Uninstlst.size())
+					if(About[i].first + 1 < Uninstlst.size()) //checks is it last process
 					{
-						About[i].first = About[i].first + 1;
-						WMIobj[i]->ExecMethod(Uninstlst[About[i].first].Uninsstr);
-						WMIobj[i]->WaitExeEnd(WMIobj[i]->GetLastPID());
-						if(WMIobj[i]->WaitExeEnd(WMIobj[i]->GetLastPID()) == 2)
+						About[i].first = About[i].first + 1; // change info about which process currently is running
+						WMIobj[i]->ExecMethod(Uninstlst[About[i].first].Uninsstr); // execute new process
+						if(WMIobj[i]->WaitExeEnd(WMIobj[i]->GetLastPID()) == 2)//wait for process end
 						{
 							InfoMsg.ShowMsg("Problem z oczekiwaniem na koniec procesu" ,"Na komputerze: " + WMIobj[i]->Getloc() + " jest dozwolone jedynie odinstalowywanie oprogramowania po jednym na raz.");
 							CanWait[i] = false;
-							//About[i].second = true;
+
 							WMIobj[i]->EndWait();
 						}
 					}
-					else About[i].second = true;
+					else About[i].second = true; //when all uninstall processes ends
 				}
 			}
 		}

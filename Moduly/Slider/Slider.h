@@ -20,6 +20,8 @@ public:
 
 	//sets current value for slider
 	void SetVal(unsigned int Val);
+	void LessOneVal();
+	void MoreOneVal();
 
 	//render slider
 	void Render();

@@ -14,8 +14,8 @@
 #include "ChkPrg.h"
 #include "RSrvStart.h"
 #include "PrgSelector.h"
+#include "InfoBox.h"
 
-//#include "Slider.h"
 
 class CMainInterface
 {
@@ -51,6 +51,11 @@ private:
 
 	};
 
+	//Info Box about getting program list
+	CInfoBox Info;
+
+	bool BRenderInfo;
+
 	// variable for keep current phase
 	Phases Phase;
 
@@ -74,6 +79,9 @@ private:
 
 	//texture menager class and container
 	CTexturesMgr TexCont;
+
+	//uninstall menager
+	CUninstMgr UninstMgr;
 
 	//Login Info
 

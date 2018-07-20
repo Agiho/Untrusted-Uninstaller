@@ -39,7 +39,7 @@ private:
 	std::vector<CUinstPrgCont> PrgDel;
 
 	// query registry key for data and place it in PrgDel
-	void QueryKey(HKEY hKey);
+	void QueryKey(HKEY hKey, std::string Key = "");
 
 	//loads DisplayName and UninstallString for programs to map
 	void CheckAll(std::string WhichKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall", std::string Computer = "local");

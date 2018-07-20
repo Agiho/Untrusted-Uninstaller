@@ -1,5 +1,16 @@
 #include "PrgSelector.h"
 
+
+CPrgSelector::CPrgSelector()
+{
+	BNeedPrepare = false;
+	BRenderPrg = false;
+
+	WMI = nullptr;
+	Log = nullptr;
+	UninstMgr = nullptr;
+}
+
 void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned int ScrH ,SDL_Renderer *Render,  std::vector<CUinstPrgCont> *Programslst, std::string FontPath,
 	std::shared_ptr<CTexture> FirstSlid, std::shared_ptr<CTexture> SecondSlid, std::shared_ptr<CTexture> StdButton)
 {
@@ -103,6 +114,11 @@ void CPrgSelector::SetWhereConnected(std::string Name)
 	WhereConnected.LoadFromRenderedTextUnicode(L"Pod³¹czony do: " + temp, TxtColor);
 }
 
+void CPrgSelector::SetUninstMgr(CUninstMgr *Mgr)
+{
+	UninstMgr = Mgr;
+}
+
 void CPrgSelector::Update()
 {
 	//update checboxes and info about how many checked
@@ -119,6 +135,8 @@ void CPrgSelector::Update()
 		if(WPrepUninst.AllOK())BeginUninstall(WPrepUninst.GetPrg());		
 		BNeedPrepare = !(WPrepUninst.AllOK());		
 	}
+
+	if(UninstMgr != nullptr)UninstMgr->Update();
 }
 
 void CPrgSelector::HandleEvent(SDL_Event *e)
@@ -234,24 +252,22 @@ void CPrgSelector::FileRead(std::string Path)
 
 void CPrgSelector::BeginUninstall(std::vector<CUinstPrgCont> Uninstall)
 {
+
+	std::vector<std::string> Comps;
+	
+	Comps.push_back(WMI->Getloc());
+
+	if(!CompNames.empty())
+	{
+		for(int i = 0; i < CompNames.size(); ++i)
+		{
+			Comps.push_back(CompNames[i].Name);
+		}
+	}
+	
 	if(!(Uninstall.empty())) //if there is programs to uninstall
 	{
-		if(Uninstall.size() == 1)
-		{
-			WMI->ExecMethod(Uninstall[0].Uninsstr);
-		}
-		else
-		{
-			//execute every uninstallsring
-			for(int i = 0 ; i < Uninstall.size(); ++i)
-			{
-				WMI->ExecMethod(Uninstall[i].Uninsstr);
-				WMI->WaitExeEnd(WMI->GetLastPID());
-				while(!(WMI->IsProcessDead()))
-				{
-				}
-			}
-		}
+		UninstMgr->StartUninstall(Comps,Uninstall);
 		std::vector<CUinstPrgCont> TempCont;
 		//remove checked program from the list
 		for(int i = 0; i < (*Uninstlst).size(); ++i)
@@ -263,28 +279,5 @@ void CPrgSelector::BeginUninstall(std::vector<CUinstPrgCont> Uninstall)
 		
 		//reset counter
 		PrgChkBox.ResetChecked();
-	}
-
-	//Run WMI for another computers in box
-	if(!(CompNames.empty()))
-	{
-		CWMIRun *Others = new CWMIRun[CompNames.size()]; // create separate WMI objects
-		for(int i = 0 ; i < CompNames.size(); ++i)
-		{
-
-			if(!(Uninstall.empty()))
-			{
-				//connect and run every uninstallstring
-				for(int i = 0 ; i < Uninstall.size(); ++i)
-				{
-					Others[i].InsertLog(Log);
-					Others[i].SecPrevAdded(true);
-					Others[i].ConnectWMI(CompNames[i].Name);
-					Others[i].ExecMethod(Uninstall[i].Uninsstr);
-				}
-			}
-
-		}
-		delete [] Others; // delete WMI objects
 	}
 }

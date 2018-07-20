@@ -10,11 +10,14 @@
 #include "PrepUninst.h"
 #include "ChkPrg.h"
 #include "MsgBox.h"
+#include "UninstMgr.h"
 
 class CPrgSelector
 {
 
 public:
+
+	CPrgSelector();
 
 	//initializes main window with programs and computers lists
 	void Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned int ScrH ,SDL_Renderer *Render,  std::vector<CUinstPrgCont> *Programslst, std::string FontPath,
@@ -22,6 +25,8 @@ public:
 
 	// set text where program is curently connected
 	void SetWhereConnected(std::string Name);
+
+	void SetUninstMgr(CUninstMgr *Mgr);
 
 	// update functions for object that need it
 	void Update();
@@ -54,6 +59,9 @@ private:
 
 	//pointer to WMI
 	CWMIRun *WMI;
+
+	//uninstall menager
+	CUninstMgr *UninstMgr;
 
 	//text color
 	SDL_Color TxtColor;

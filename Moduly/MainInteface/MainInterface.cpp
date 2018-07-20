@@ -20,7 +20,22 @@ void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker , CWMIRun *WMI , SDL_Rend
 	WAIWin.Init(TLog, TexCont.LoadTex(GetTexbyID(1)), Render, butpos, ScrW, ScrH,  FontPath);
 	Select.Init(TLog, RExec, ScrW, ScrH, Render, &Programs, FontPath, TexCont.LoadTex(GetTexbyID(2)), TexCont.LoadTex(GetTexbyID(3)), TexCont.LoadTex(GetTexbyID(1)));
 
+	UninstMgr.Init(TLog);
+	Select.SetUninstMgr(&UninstMgr);
+	
+	//infobox about getting program list;
+	SDL_Rect InfoSize;
+	InfoSize.x = 100;
+	InfoSize.w = ScrW - 200;
+	InfoSize.h = ScrH / 2;
+	InfoSize.y = (ScrH / 2) - InfoSize.h/2;
+	SDL_Color Col = {0,0,0};
+	Info.Init(TLog,InfoSize,Render,FontPath,Col);
+	Info.SetInfo(L"Proszê czekaæ, trwa pobieranie listy programów...");
+
+	BRenderInfo = false;
 	BQuit = false;
+
 }
 
 void CMainInterface::Render()
@@ -30,11 +45,14 @@ void CMainInterface::Render()
 	case LOCALCH:
 		Local.Render();
 		Remote.Render();
+		if(BRenderInfo) Info.Render();
+
 		break;
 
 	case GETIP:
 
 		WAIWin.Render();
+		if(BRenderInfo) Info.Render();
 
 		break;
 
@@ -60,15 +78,24 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 	switch(Phase)
 	{
 	case LOCALCH:
-		if (Local.HandleEvent(e))
+		if(!BRenderInfo)
+		{
+			if (Local.HandleEvent(e))
+			{
+				BRenderInfo = true;
+			}
+			
+		}
+		else 
 		{
 			//Login to local Computer
 			Programs = Checker->GetPrgandPath();
 			RExec->ConnectWMI();
 			Select.SetPrg(&Programs);
 			Select.SetWhereConnected("Ten Komputer");
+			UninstMgr.AddCred();
 			Phase = PRG_SELECT;
-
+			BRenderInfo = false;
 		}
 		
 		//change to window where user input info about login
@@ -77,7 +104,8 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 		break;
 
 	case GETIP:
-		if (WAIWin.HandleEvent(e))
+
+		if(BRenderInfo)
 		{
 			//getting info
 			IP = WAIWin.GetIP();
@@ -95,8 +123,16 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			Checker->InstertWMIPointer(RExec);
 			Programs = Checker->GetPrgandPath(IP, USER, PASSWORD);
 
-			if(USER == "Domniemany")RExec->ConnectWMI(IP);
-			else RExec->ConnectWMI(IP, USER, PASSWORD);
+			if(USER == "Domniemany")
+			{
+				RExec->ConnectWMI(IP);
+				UninstMgr.AddCred();
+			}
+			else
+			{
+				RExec->ConnectWMI(IP, USER, PASSWORD);
+				UninstMgr.AddCred(USER, PASSWORD);
+			}
 			
 
 			Select.SetPrg(&Programs);
@@ -106,6 +142,14 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			RSrv.StopRemoteService(IP,"RemoteRegistry");
 
 			Phase = PRG_SELECT;
+
+			BRenderInfo = false;
+
+		}
+		else if (WAIWin.HandleEvent(e))
+		{
+			
+			BRenderInfo = true;
 
 		}
 		break;
