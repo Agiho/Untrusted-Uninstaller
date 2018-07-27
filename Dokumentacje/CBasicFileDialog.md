@@ -1,6 +1,6 @@
 ## **CBasicFileDialog**
 
-Klasa do wyświetlenia okna z prośbą o podanie pliku izwracająca ścieżkę do niego
+Klasa do wyświetlenia okna z prośbą o podanie pliku i zwracająca ścieżkę do niego
 
 | Funkcja                                  | Opis                                     |
 | ---------------------------------------- | ---------------------------------------- |

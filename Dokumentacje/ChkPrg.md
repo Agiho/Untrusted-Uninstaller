@@ -1,4 +1,4 @@
-## **CBasicFileDialog**
+## **ChkPrg**
 
 Klasa do pobierania danych z klucza rejestru, pozwala na pobranie danych znajdujących sie w podkluczach SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall, takich jak nazwa i ścieżka pozwalająca odinstalowac program
 

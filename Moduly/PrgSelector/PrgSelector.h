@@ -26,6 +26,7 @@ public:
 	// set text where program is curently connected
 	void SetWhereConnected(std::string Name);
 
+	// sets pointer to uninstallation menager
 	void SetUninstMgr(CUninstMgr *Mgr);
 
 	// update functions for object that need it

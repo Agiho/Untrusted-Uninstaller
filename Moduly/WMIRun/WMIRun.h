@@ -47,6 +47,7 @@ public:
 
 	// CHange BSecAdded value, Connecting can have problem when somewhere WMI connect before and initialize security, no need to do it twice
 	void SecPrevAdded(bool Added = false);
+
 	// return BSecAdded value
 	bool IsSecPrevAdded();
 

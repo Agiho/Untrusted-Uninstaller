@@ -16,27 +16,27 @@ void CInfoBox::Init(CLog *TLog, SDL_Rect TSize, SDL_Renderer *Render, std::strin
 	TxtSize = 15;
 
 	SDL_Point PPos = {TSize.x + 5, TSize.y + ((TSize.h/2) - TxtSize/2)};
-	TxtPos = PPos;
-	Info.Init(PPos,Font, 15, TLog, Render);
-	Info.LoadFromRenderedTextUnicode(CurWText, Col);
+	TxtPos = PPos; //text position
+	Info.Init(PPos,Font, 15, TLog, Render); //init tex
+	Info.LoadFromRenderedTextUnicode(CurWText, Col); //update text
 }
 
 void CInfoBox::SetInfo(std::string Txt)
 {
-	CurText = Txt;
+	CurText = Txt;// get new text
 
-	Info.LoadFromRenderedText(CurText, Col);
+	Info.LoadFromRenderedText(CurText, Col);//update text
 
-	TxtPos.x = Size.x + Size.w/2 - Info.GetWidth()/2;
+	TxtPos.x = Size.x + Size.w/2 - Info.GetWidth()/2;//place text on center
 }
 
 void CInfoBox::SetInfo(std::wstring Txt)
 {
-	CurWText = Txt;
+	CurWText = Txt; // get new text
 
-	Info.LoadFromRenderedTextUnicode(CurWText, Col);
+	Info.LoadFromRenderedTextUnicode(CurWText, Col); //update text
 
-	TxtPos.x = Size.x + Size.w/2 - Info.GetWidth()/2;
+	TxtPos.x = Size.x + Size.w/2 - Info.GetWidth()/2; //place text on center
 }
 
 std::string CInfoBox::GetCurText()

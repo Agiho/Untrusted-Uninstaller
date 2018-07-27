@@ -1,0 +1,44 @@
+=========================================================================================================
+=                                                                                                       =
+=                                             CHANGELOG                                                 =	
+=                                                                                                       =
+=========================================================================================================
+
+# v0.1.2:
+
+Fixed:
+
+-WMI multiple strings execution (now wait until previous ends)
+-Now Creates uninstall string for Libre office (in LibreOffice 4 and 5, uninstall string don't exist)
+
+
+Addes
+
+-Messageboxes class
+-Uninstall Menager class
+-Messagebox shows when user start uninstall process to ask is he sure, and shows when erros occurs during Executing string via WMI
+-Box with information shows when program reads computers registry and fill container
+
+---------------------------------------------------------------
+
+# v0.1.1:
+
+Fixed:
+
+-Slider button size and position calculation
+-Programs list is now sorted
+-WMI Execution corrections
+-Code cleanup
+
+---------------------------------------------------------------
+
+# v0.1.0:
+
+Works reading 32 and 64 bit registry from 32 bit app
+Works Checkbox with programs list
+Works WMI connecting to local and remote computers
+Works Executing uninstall process
+Works Adding new computers from file
+Configuration for non standard strings
+
+----------------------------------------------------------------

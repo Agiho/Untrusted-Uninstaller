@@ -11,6 +11,7 @@ Klasa przechowująca informacje do oinstalowania programu
 
 friend class CPrepareUninst
 friend class CPrgSelector
+friend class CUninstMgr
 template <typename T> friend class CCheckBoxCont
 
 Dostępna pola dla przyjaciół:
