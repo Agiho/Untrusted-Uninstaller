@@ -21,12 +21,13 @@ void CInputTextBox::Init(CLog *TLog, SDL_Rect Pos, std::string FontPath, SDL_Ren
 	TxtOnScreen.Init(Point, FontPath, Size, TLog, Render);
 	TxtOnScreen.LoadFromRenderedText(" ",Color);
 
+	BHide = false;
 	BInput = false;
 }
 
 void CInputTextBox::Input(SDL_Event *e)
 {
-
+	
 	if (e->type == SDL_MOUSEBUTTONDOWN)
 	{
 		BInput = true;
@@ -61,13 +62,17 @@ void CInputTextBox::Input(SDL_Event *e)
 	if (BInput)
 	{
 		bool renderText = false;
+		
 		//Special key input
 		if (e->type == SDL_KEYDOWN)
 		{ //Handle backspace 
 			if (e->key.keysym.sym == SDLK_BACKSPACE && Txt.length() > 0)
 			{
 				//lop off character 
-				Txt.pop_back(); renderText = true;
+				if((int)(Txt[Txt.size() - 1]) < 0)Txt.pop_back(); //if it is special character
+				Txt.pop_back(); 
+				renderText = true;
+
 			} //Handle copy else 
 			if (e->key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)
 			{
@@ -97,8 +102,25 @@ void CInputTextBox::Input(SDL_Event *e)
 			//Text is not empty 
 			if (Txt != "")
 			{
-				//Render new text 
-				TxtOnScreen.LoadFromRenderedText(Txt.c_str(), TextColor);
+				
+				// render dots to Hide text
+				if(BHide)
+				{
+					int DotsNr = Txt.size(); // size of string
+					int Special = 0;
+					for(int i = 0; i < Txt.size(); ++i)
+					{
+						if(Txt[i] < 0) ++Special; //how many special charaters
+					}
+					DotsNr = DotsNr - Special/2; // that many characters
+					std::string TempTxt ="";
+					for(int i = 0; i < DotsNr; ++i)
+					{
+						TempTxt = TempTxt + "*"; //create dots
+					}
+					TxtOnScreen.LoadFromRenderedText(TempTxt.c_str(), TextColor); //update text
+				}
+				else TxtOnScreen.LoadFromRenderedText(Txt.c_str(), TextColor);//Render new text 
 			}
 			//Text is empty 
 			else
@@ -121,7 +143,12 @@ void CInputTextBox::ClrTxt()
 	Txt.clear();
 	Txt = "";
 }
-	
+
+void CInputTextBox::Hide(bool Hid)
+{
+	BHide = Hid;
+}
+
 void CInputTextBox::SetTxt(std::string SetTxt)
 {
 	Txt = SetTxt;

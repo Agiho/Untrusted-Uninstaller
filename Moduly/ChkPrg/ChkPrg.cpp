@@ -174,7 +174,6 @@ void ChkPrg::QueryKey(HKEY hKey, std::string CurrentKey)
 			STempPath.clear();
 			SQuietUninst.clear();
 		}
-
     }
 }
 

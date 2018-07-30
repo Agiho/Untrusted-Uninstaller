@@ -40,6 +40,7 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 	Position.y = Window.y + (Window.h / 2) + TxtHeight + 10;
 	Password.Init(TLog, Position, Font, Render, Col, 15);
 	Password.SetTxt("Domniemane");
+	Password.Hide(true);
 
 	PPos.x = Position.x - 50;
 	PPos.y = Position.y;

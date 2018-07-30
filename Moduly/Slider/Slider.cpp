@@ -43,6 +43,7 @@ void CSlider::Init(CLog *TLog, int Tx, int Ty, int Tw, int Th, int ButW, int But
 		Bar.y = StartTexY;
 		Bar.w = Tw - ButW*2;
 		Bar.h = ButH;
+		Slider.SetDiam(Bar.w, ButH);
 	}
 	///////////////////////
 	CurValue = 0;
@@ -78,6 +79,18 @@ void CSlider::SetMaxVal(unsigned int Val)
 			Slider.SetDiam(Size,Slider.GetHeight()); //set new size
 		}
 		
+	}
+	else //when slider buuton must be sieze of bar
+	{
+		if (Vertical) 
+		{
+			Slider.SetDiam(Slider.GetWidth() ,Bar.h); //set new size
+		}
+		else 
+		{
+
+			Slider.SetDiam(Bar.w,Slider.GetHeight()); //set new size
+		}
 	}
 }
 

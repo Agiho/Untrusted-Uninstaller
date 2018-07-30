@@ -8,6 +8,7 @@ Klasa do zarządzania polem do wpisywania tekstu
 | `void Input(SDL_Event *e)`               | ***Sprawdza czy box został kliknięty, jesli tak to rozpoczyna wprowadzanie znaków*** **Argument:** wskaźnik do zmiennej ze zdarzeniami |
 | `std::string GetText()`                  | ***Zwraca tekst przechowywany w textboxie*** |
 | `void ClrTxt()`                          | ***Czyści przechowywany tekst***         |
+| `void Hide(bool Hid);`                   | ***Pozwala ukryć wpisywany tekst (pojawią się * zamiast wpisywanego tekstu*** **Argument:** Wartość logiczna, czy teskt ma być ukryty |
 | `void SetTxt(std::string SetTxt)`        | ***Ustawia tekst na podany w argumencie*** **Argument:** tekst do umieszczenia w textboxie |
 | `void ChangeColor(SDL_Color textCol)`    | ***Zmienia kolor czcionki na podany*** **Argument** Nowy kolor czcionki |
 | `void Render()`                          | ***Wyświetla texbox i tekst w nim        |

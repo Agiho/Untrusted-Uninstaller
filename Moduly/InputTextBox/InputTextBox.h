@@ -20,6 +20,9 @@ public:
 	//clears text
 	void ClrTxt();
 
+	//hiding text
+	void Hide(bool Hid);
+
 	//sets new text
 	void SetTxt(std::string SetTxt);
 
@@ -51,6 +54,9 @@ private:
 
 	//need to input
 	bool BInput;
+
+	//true when need hide text on screen
+	bool BHide;
 
 	//font size
 	unsigned int TxtSize;

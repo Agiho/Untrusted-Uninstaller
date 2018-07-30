@@ -43,18 +43,26 @@ void CUninstMgr::StartUninstall(std::vector<std::string> Where, std::vector<CUin
 			AboutWMIObj.second = false;
 
 			bool BCanWait = true;
-			WMI->ExecMethod(TUninstlst[0].Uninsstr); //execute method
-			if(WMI->WaitExeEnd(WMI->GetLastPID()) == 2) //try to start wait function
+			int Error = WMI->ExecMethod(TUninstlst[0].Uninsstr); //execute method
+			if(Error)
+			{
+				InfoMsg.ShowMsg("Problem z wykonaniem instrukcji " + Where[i], "Niepowodzenie uruchomienia procesu odinstalowywania na komputerze: " + Where[i]);
+			}
+			else if(WMI->WaitExeEnd(WMI->GetLastPID()) == 2) //try to start wait function
 			{
 				InfoMsg.ShowMsg("Problem z oczekiwaniem na koniec procesu", "Na komputerze: " + Where[i] + " jest dozwolone jedynie odinstalowywanie oprogramowania po jednym na raz.");
 				BCanWait = false;
 				WMI->EndWait();
 			}
 
-			//pushes information object and WMI object for each computer to containers
-			CanWait.push_back(BCanWait);
-			WMIobj.push_back(std::unique_ptr<CWMIRun>(WMI));
-			About.push_back(AboutWMIObj);
+			if(Error) delete WMI; // when can't execute methods on computer, don't need keep it in containers
+			else
+			{
+				//pushes information object and WMI object for each computer to containers
+				CanWait.push_back(BCanWait);
+				WMIobj.push_back(std::unique_ptr<CWMIRun>(WMI));
+				About.push_back(AboutWMIObj);
+			}
 		}
 
 	}

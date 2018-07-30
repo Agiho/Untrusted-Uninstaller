@@ -50,6 +50,7 @@ private:
 	//check remote system
 	bool IsRemote64OS(std::string SRemoteIP, std::string User = "", std::string Pass = "");
 
+	//get registy keys using WMI
 	void CheckRemote64Keys(std::string SRemoteIP, std::string MainKey = "HKEY_LOCAL_MACHINE", std::string WhichKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\", std::string User = "", std::string Pass = "");
 
 	//erases map content andd frees memory

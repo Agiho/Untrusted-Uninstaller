@@ -23,7 +23,7 @@ public:
 
 	//handle event for slider and checkboxes
 	void HandleEvent(SDL_Event *e);
-
+	
 	//returns checked programs
 	std::vector<T> GetChk();
 
@@ -64,6 +64,7 @@ private:
 	std::vector<T> *Content; //program and uninstall paths list
 
 };
+
 
 
 template <class T>
@@ -314,6 +315,8 @@ std::vector<T> CCheckBoxCont<T>::GetChk()
 template <class T>
 void CCheckBoxCont<T>::SetNewList(std::vector<T> *New)
 {
+	CurrentLine = 0;
+	Slider.SetVal(0);
 	// adds new objects list to vector and change max value for slider
 	Content = New;
 	int Help =((*Content).size() - Names.size());

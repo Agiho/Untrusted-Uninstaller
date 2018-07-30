@@ -1,6 +1,5 @@
 #include "TextHandler.h"
 
-
 CTextHandler::CTextHandler()
 {
 	//Initialize
@@ -44,10 +43,10 @@ void CTextHandler::SetPos(SDL_Point Point )
 bool CTextHandler::LoadFromRenderedText( std::string textureText, SDL_Color textColor )
 {
 	//Get rid of preexisting texture
+	
 	Free();
-    
 	//create surface from text
-	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
+	SDL_Surface* textSurface = TTF_RenderUTF8_Solid( gFont, textureText.c_str() , textColor );
 	if( textSurface == NULL )
 	{
 		std::stringstream stream;

@@ -4,6 +4,25 @@
 =                                                                                                       =
 =========================================================================================================
 
+
+# v0.1.3:
+
+Fixed:
+
+-Slider button size calculation when new list haven't many objects
+-UTF-8 support in inputboxes
+-password inputbox now hide password(shows only '*')
+
+
+
+Added:
+
+-Messagebox when WMI can't start
+-Filter Option ( now user can search programs in list)
+
+
+---------------------------------------------------------------
+
 # v0.1.2:
 
 Fixed:
@@ -12,7 +31,7 @@ Fixed:
 -Now Creates uninstall string for Libre office (in LibreOffice 4 and 5, uninstall string don't exist)
 
 
-Addes
+Added:
 
 -Messageboxes class
 -Uninstall Menager class

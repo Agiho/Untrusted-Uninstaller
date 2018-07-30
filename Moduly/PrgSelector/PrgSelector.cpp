@@ -5,6 +5,7 @@ CPrgSelector::CPrgSelector()
 {
 	BNeedPrepare = false;
 	BRenderPrg = false;
+	BFilter = false;
 
 	WMI = nullptr;
 	Log = nullptr;
@@ -16,10 +17,11 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 {
 	BNeedPrepare = false;
 	BRenderPrg = false;
+	BFilter = false;
 	int ButH = 50;
 	int ButW = 100;
 	Log = TLog;
-
+	
 	WMI = TWMI;
 
 	SDL_Color C = {0,0,0};
@@ -31,14 +33,15 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	FromFile.SetCaption("Z Pliku");
 	Begin.Init(ScrW - ButW - 10, ScrH - ButH - 10, ButW, ButH, StdButton,0,0, TLog, Render, "","", FontPath);
 	Begin.SetCaption("Start");
-	
+	Filter.Init(50 + (60 + ScrW/2) - ButW/2, ScrH - ButH - 10 ,  ButW, ButH, StdButton,0,0, TLog, Render, "","", FontPath);
+	Filter.SetCaption("Filtruj");
 
 	//text initialization
 	SDL_Point Pos;
 	Pos.x = 10;
 	Pos.y = ScrH - ButH - 10;
 	HowManyUninst.Init(Pos,FontPath, ButH /2 ,TLog, Render);
-	HowManyUninst.LoadFromRenderedText("Zaznaczono do odinstalwania: 0", TxtColor);
+	HowManyUninst.LoadFromRenderedText("Wybrano do odinstalowania: 0", TxtColor);
 	Pos.x = 10;
 	Pos.y = ButH + 10;
 	WhereConnected.Init(Pos,FontPath, ButH /2,TLog, Render);
@@ -52,8 +55,12 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	RectPos.y = ButH;
 	RectPos.w = ButW*2;
 	RectPos.h = ButH;
-	IPBox.Init(TLog, RectPos, FontPath, Render, TxtColor, ButH/2);
+	IPBox.Init(TLog, RectPos, FontPath, Render, TxtColor, ButH/2 - 2);
 	IPBox.SetTxt("");
+	RectPos.x = (60 + ScrW/2) - RectPos.w;
+	RectPos.y = ScrH - ButH - 10;
+	InputFilter.Init(TLog, RectPos, FontPath, Render, TxtColor, (ButH/2) - 2);
+	InputFilter.SetTxt("");
 
 	//checkboxes initialization with empty list
 	SDL_Rect Frame;
@@ -126,7 +133,7 @@ void CPrgSelector::Update()
 	{
 		NrCheckedPrg = PrgChkBox.Checked();
 		std::stringstream Mystream;
-		Mystream << "Zaznaczono do odinstalwania: " << NrCheckedPrg;
+		Mystream << "Wybrano do odinstalowania: " << NrCheckedPrg;
 		HowManyUninst.LoadFromRenderedText(Mystream.str(), TxtColor);
 	}
 	// update checkprogram window when need prepare
@@ -171,8 +178,57 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 				else BNeedPrepare = true; //if not need prepare it
 			}
 		}
+		if(Filter.HandleEvent(e))
+		{
+			auto FilterTxt = InputFilter.GetText();
+			if((FilterTxt == "") || (FilterTxt == " ")) // if there is no filter
+			{
+				if(BFilter)
+				{
+					BFilter = false;
+					PrgChkBox.SetNewList(Uninstlst);
+					if(!Filtered.empty())
+					{
+						for(int i = 0; i < Filtered.size(); ++i)
+						{
+							(*FilterMainCon[i]) = Filtered[i];
+						}
+						Filtered.erase(Filtered.begin(), Filtered.end());
+						FilterMainCon.erase(FilterMainCon.begin(), FilterMainCon.end());
+					}
+				}
+			}
+			else
+			{
+				if(!Uninstlst->empty())
+				{
+					if(!Filtered.empty())
+					{
+						for(int i = 0; i < Filtered.size(); ++i)
+						{
+							(*FilterMainCon[i]) = Filtered[i];
+						}
+						Filtered.erase(Filtered.begin(), Filtered.end());
+						FilterMainCon.erase(FilterMainCon.begin(), FilterMainCon.end());
+					}
+					for(int i = 0; i < Uninstlst->size(); ++i)
+					{
+						if((*Uninstlst)[i].Name.find(FilterTxt.c_str()) != std::string::npos )
+						{
 
-		IPBox.Input(e); //input to inputbox
+							Filtered.push_back((*Uninstlst)[i]);
+							FilterMainCon.push_back( &( (*Uninstlst)[i]) );
+							PrgChkBox.SetNewList(&Filtered);
+							BFilter = true;
+						}
+					}
+				}
+			}
+		}
+
+		 //input to inputbox
+		IPBox.Input(e);
+		InputFilter.Input(e);
 
 		//checkboxes events
 		PrgChkBox.HandleEvent(e);
@@ -191,11 +247,13 @@ void CPrgSelector::Render()
 	WhereConnected.Render();
 	WhereInstall.Render();
 	IPBox.Render();
+	InputFilter.Render();
 
 	//buttons
 	Plus.Render();
 	FromFile.Render();
 	Begin.Render();
+	Filter.Render();
 
 	//checkboxes
 	if(BRenderPrg)PrgChkBox.Render();
@@ -263,6 +321,16 @@ void CPrgSelector::BeginUninstall(std::vector<CUinstPrgCont> Uninstall)
 		{
 			Comps.push_back(CompNames[i].Name);
 		}
+	}
+
+	if(!Filtered.empty())
+	{
+		for(int i = 0; i < Filtered.size(); ++i)
+		{
+			(*FilterMainCon[i]) = Filtered[i];
+		}
+		Filtered.erase(Filtered.begin(), Filtered.end());
+		FilterMainCon.erase(FilterMainCon.begin(), FilterMainCon.end());
 	}
 	
 	if(!(Uninstall.empty())) //if there is programs to uninstall

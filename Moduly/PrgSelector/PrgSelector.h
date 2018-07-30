@@ -26,6 +26,9 @@ public:
 	// set text where program is curently connected
 	void SetWhereConnected(std::string Name);
 
+	//show filtered list
+	void ShowFilter(std::string FilterWord);
+
 	// sets pointer to uninstallation menager
 	void SetUninstMgr(CUninstMgr *Mgr);
 
@@ -55,6 +58,9 @@ private:
 	//there is need renderprglist (will be removed)
 	bool BRenderPrg;
 
+	//is filter on
+	bool BFilter;
+
 	//how many programs are checked
 	unsigned int NrCheckedPrg;
 
@@ -72,11 +78,13 @@ private:
 	CTextHandler WhereConnected;
 	CTextHandler WhereInstall;
 	CInputTextBox IPBox;
+	CInputTextBox InputFilter;
 
 	//buttons displayed in program selection screen
 	CButton Plus;
 	CButton FromFile;
 	CButton Begin;
+	CButton Filter;
 
 	//messagebox
 	CMsgBox MsgYesNo;
@@ -93,6 +101,10 @@ private:
 
 	// pointer to programs list  
 	std::vector<CUinstPrgCont> *Uninstlst;
+
+	//filtered list 
+	std::vector<CUinstPrgCont> Filtered;
+	std::vector<CUinstPrgCont*> FilterMainCon;
 
 	// container of computers where too must start uninstallation process
 	std::vector<SCompInfo> CompNames;
