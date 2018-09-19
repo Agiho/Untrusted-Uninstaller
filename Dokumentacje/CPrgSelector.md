@@ -8,6 +8,7 @@ Klasa która wyświetla okno w którym mozna dokonac wyboru aplikacji do odinsta
 | `void SetWhereConnected(std::string Name)` | ***Pozwala przekazać klasie gdzie obecnie jest podłączony uzytkownik** **Argument:** Lokalizacja do której jest zalogowany, jako lokalny komputer nalezy wpisac "Ten Komputer"
 | `void ShowFilter(std::string FilterWord)` | ***Ustawia wskazany filtr w dla kontenera, wyświetla tylko programy zawierające ten ciąg*** **Argument:** Ciąg znaków który ma byc filtrem |
 | `void SetUninstMgr(CUninstMgr *Mgr` | ***Pozwala przekazać obiekt który zarządza procesami odinstalowywania*** **Argument:** Wskaźnik na obiekt do zarządzania procesami |
+| `void SetTerminator(CTerminator *TTerminator)` | ***Pozwala przekazac wskaxnik na klase do kończenia działania procesów do klasy*** **Argument** wskażnik na terminatora |
 | `void Update()`               | ***Uruchamia funkcje aktualizujące podklasy*** |
 | `void HandleEvent(SDL_Event *e)` | ***Przekazuje zdarzenia do poszczególnych obiektów*** **Argument:** Wskaxnik na zmienną ze zdarzeniami |
 | `void Render()`               | ***Wyświetla Okno wraz z przyciskami i polami i podległymi oknami innych klas*** |

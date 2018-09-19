@@ -5,6 +5,7 @@ CPrgSelector::CPrgSelector()
 {
 	BNeedPrepare = false;
 	BRenderPrg = false;
+	BShowTerminator = false;
 	BFilter = false;
 
 	WMI = nullptr;
@@ -18,6 +19,7 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	BNeedPrepare = false;
 	BRenderPrg = false;
 	BFilter = false;
+	BShowTerminator = false;
 	int ButH = 50;
 	int ButW = 100;
 	Log = TLog;
@@ -29,32 +31,43 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 
 	//Buttons initialization
 	Plus.Init(ScrW - ButW, ButH , ButW/2, ButH, StdButton, ButW, 0, TLog, Render, "", "",FontPath);
+	Plus.SetDiam(ButW/2 - 10, ButH - 10);
 	FromFile.Init(ScrW - ButW, ButH*2, ButW, ButH, StdButton, 0,0, TLog, Render, "", "",FontPath);
+	FromFile.SetDiam(ButW, ButH -10);
 	FromFile.SetCaption("Z Pliku");
 	Begin.Init(ScrW - ButW - 10, ScrH - ButH - 10, ButW, ButH, StdButton,0,0, TLog, Render, "","", FontPath);
+	Begin.SetDiam(ButW, ButH -10);
 	Begin.SetCaption("Start");
+	Terminate.Init(ScrW - ButW*3 - 5, ScrH - ButH - 10, ButW, ButH, StdButton,0,0, TLog, Render, "","", FontPath);
+	Terminate.SetDiam(ButW*2 - 10, ButH - 10);
+	Terminate.SetCaption("Przerwij proces");
 	Filter.Init(50 + (60 + ScrW/2) - ButW/2, ScrH - ButH - 10 ,  ButW, ButH, StdButton,0,0, TLog, Render, "","", FontPath);
+	Filter.SetDiam(ButW, ButH - 10);
 	Filter.SetCaption("Filtruj");
 
 	//text initialization
 	SDL_Point Pos;
 	Pos.x = 10;
 	Pos.y = ScrH - ButH - 10;
-	HowManyUninst.Init(Pos,FontPath, ButH /2 ,TLog, Render);
+	HowManyUninst.Init(Pos,FontPath, ButH/2 - 5 ,TLog, Render);
 	HowManyUninst.LoadFromRenderedText("Wybrano do odinstalowania: 0", TxtColor);
 	Pos.x = 10;
 	Pos.y = ButH + 10;
-	WhereConnected.Init(Pos,FontPath, ButH /2,TLog, Render);
+	WhereConnected.Init(Pos,FontPath, ButH/2 - 5,TLog, Render);
 	WhereConnected.LoadFromRenderedText("Pod³¹czony do: ", TxtColor);
+	Pos.x = ScrW- ButW*6;
+	Pos.y = ButH + 10;
+	IPInfo.Init(Pos,FontPath, (ButH/2) - 5,TLog, Render);
+	IPInfo.LoadFromRenderedText("Adres IP dodatkowego komputera:", TxtColor);
 	Pos.x = ScrW - ButW*3;
 	Pos.y = ButH*2 + ButH/2;
-	WhereInstall.Init(Pos,FontPath, ButH / 2,TLog, Render);
+	WhereInstall.Init(Pos,FontPath, ButH/2 - 5,TLog, Render);
 	WhereInstall.LoadFromRenderedTextUnicode(L"Wykonaj te¿ na:", TxtColor);
 	SDL_Rect RectPos;
 	RectPos.x = ScrW - ButW*3;
 	RectPos.y = ButH;
 	RectPos.w = ButW*2;
-	RectPos.h = ButH;
+	RectPos.h = ButH - 10;
 	IPBox.Init(TLog, RectPos, FontPath, Render, TxtColor, ButH/2 - 2);
 	IPBox.SetTxt("");
 	RectPos.x = (60 + ScrW/2) - RectPos.w;
@@ -88,27 +101,7 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	butpos.h = 50;
 	WPrepUninst.Init(TLog, StdButton, Render, butpos, ScrW, ScrH, FontPath);
 
-	//messagebox
-
-	SDL_MessageBoxColorScheme colorScheme = 
-	{
-		{ /* .colors (.r, .g, .b) */
-			/* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
-			{ 222,   255,   255 },
-			/* [SDL_MESSAGEBOX_COLOR_TEXT] */
-			{   0, 255,   0 },
-			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
-			{ 255, 255,   0 },
-			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
-			{   200,  255, 255 },
-			/* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
-			{ 255,   0, 255 }
-		}
-	};
 	
-	//message box
-	MsgYesNo.IstertLog(TLog);
-	MsgYesNo.MakeYesNo();
 	
 }
 
@@ -124,6 +117,11 @@ void CPrgSelector::SetWhereConnected(std::string Name)
 void CPrgSelector::SetUninstMgr(CUninstMgr *Mgr)
 {
 	UninstMgr = Mgr;
+}
+
+void CPrgSelector::SetTerminator(CTerminator *TTerminator)
+{
+	Terminator = TTerminator;
 }
 
 void CPrgSelector::Update()
@@ -148,7 +146,7 @@ void CPrgSelector::Update()
 
 void CPrgSelector::HandleEvent(SDL_Event *e)
 {
-	if(!BNeedPrepare) // handle this when window for preparing string is bot active
+	if(!BNeedPrepare && !BShowTerminator) // handle this when window for preparing string is bot active
 	{
 		if(Plus.HandleEvent(e)) //plus button event
 		{
@@ -171,12 +169,19 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 		}
 		if(Begin.HandleEvent(e)) //begin button clicked
 		{
+			CMsgBox MsgYesNo;
+			MsgYesNo.IstertLog(Log);
+			MsgYesNo.MakeYesNo();
 			if(MsgYesNo.ShowMsg("Odinstalowywanie Oprogramowania", "Czy na pewno chcesz by te programy odinstalowano?") == 1)
 			{
 				WPrepUninst.CheckPrg(PrgChkBox.GetChk()); //check that programs sings are correct
 				if(WPrepUninst.AllOK()) BeginUninstall(WPrepUninst.GetPrg()); //if ok begin uninsall			
 				else BNeedPrepare = true; //if not need prepare it
 			}
+		}
+		if(Terminate.HandleEvent(e)) //begin button clicked
+		{
+			BShowTerminator = true;
 		}
 		if(Filter.HandleEvent(e))
 		{
@@ -234,9 +239,13 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 		PrgChkBox.HandleEvent(e);
 		CompChkBox.HandleEvent(e);
 	}
-	else
+	else if(BNeedPrepare)
 	{
 		WPrepUninst.HandleEvent(e); //prepare window events
+	}
+	else if(BShowTerminator)
+	{
+		if(Terminator->HandleEvent(e)) BShowTerminator = false;;
 	}
 }
 
@@ -246,6 +255,7 @@ void CPrgSelector::Render()
 	HowManyUninst.Render();
 	WhereConnected.Render();
 	WhereInstall.Render();
+	IPInfo.Render();
 	IPBox.Render();
 	InputFilter.Render();
 
@@ -254,6 +264,7 @@ void CPrgSelector::Render()
 	FromFile.Render();
 	Begin.Render();
 	Filter.Render();
+	Terminate.Render();
 
 	//checkboxes
 	if(BRenderPrg)PrgChkBox.Render();
@@ -261,6 +272,10 @@ void CPrgSelector::Render()
 	if(BNeedPrepare)
 	{
 		WPrepUninst.Render();
+	}
+	if(BShowTerminator)
+	{
+		Terminator->Render();
 	}
 }
 
@@ -332,7 +347,7 @@ void CPrgSelector::BeginUninstall(std::vector<CUinstPrgCont> Uninstall)
 		Filtered.erase(Filtered.begin(), Filtered.end());
 		FilterMainCon.erase(FilterMainCon.begin(), FilterMainCon.end());
 	}
-	
+
 	if(!(Uninstall.empty())) //if there is programs to uninstall
 	{
 		UninstMgr->StartUninstall(Comps,Uninstall);
@@ -344,8 +359,8 @@ void CPrgSelector::BeginUninstall(std::vector<CUinstPrgCont> Uninstall)
 		}
 		(*Uninstlst).erase((*Uninstlst).begin(), (*Uninstlst).end());
 		(*Uninstlst) = TempCont;
-		
+		PrgChkBox.SetNewList(Uninstlst);
 		//reset counter
-		PrgChkBox.ResetChecked();
-	}
+		PrgChkBox.ResetChecked();		
+	}	
 }

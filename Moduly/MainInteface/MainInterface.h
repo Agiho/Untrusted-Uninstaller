@@ -83,6 +83,9 @@ private:
 	//uninstall menager
 	CUninstMgr UninstMgr;
 
+	//object for terminate processes
+	CTerminator Terminator;
+
 	//Login Info
 
 	std::string IP;

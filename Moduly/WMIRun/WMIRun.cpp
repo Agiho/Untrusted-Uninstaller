@@ -1016,8 +1016,8 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	varArg2.vt = VT_BSTR;
 
 	//conversion string to wchar_t / BSTR
-	wchar_t Key[128];
-	for(int i = 0; i < 128; ++i)
+	wchar_t Key[512];
+	for(int i = 0; i < 512; ++i)
 	{
 		Key[i] = NULL; //NULL at end needed
 	}
@@ -1037,8 +1037,8 @@ std::string CWMIRun::GetSringVal(std::string MainKey,std::string SKey,std::strin
 	varArg3.vt = VT_BSTR;
 
 	//conversion string to wchar_t / BSTR
-	wchar_t Value[128];
-	for(int i = 0; i < 128; ++i)
+	wchar_t Value[512];
+	for(int i = 0; i < 512; ++i)
 	{
 		Value[i] = NULL;//NULL at end needed
 	}

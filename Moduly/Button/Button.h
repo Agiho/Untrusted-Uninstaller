@@ -74,6 +74,7 @@ private:
 	//caption writen on button
 	std::string Caption;
 	bool FontInit;
+	std::string PathFont;
 
 	// CaptionHandler
 	CTextHandler CaptionH;

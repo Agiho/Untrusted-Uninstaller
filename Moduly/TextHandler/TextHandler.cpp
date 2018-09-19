@@ -50,8 +50,8 @@ bool CTextHandler::LoadFromRenderedText( std::string textureText, SDL_Color text
 	if( textSurface == NULL )
 	{
 		std::stringstream stream;
-		stream << "Unable to render text surface! SDL_ttf Error: %s\n" << TTF_GetError();
-		Log->WriteTxt(stream.str());
+		stream << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError();
+		//Log->WriteTxt(stream.str());
 	}
 	else
 	{
@@ -60,8 +60,8 @@ bool CTextHandler::LoadFromRenderedText( std::string textureText, SDL_Color text
 		if( mTexture == NULL )
 		{
 			std::stringstream stream;
-			stream << "Unable to create texture from rendered text! SDL Error: %s\n" << SDL_GetError();
-			Log->WriteTxt(stream.str());
+			stream << "Unable to create texture from rendered text! SDL Error:" << SDL_GetError();
+			//Log->WriteTxt(stream.str());
 		}
 		else
 		{
@@ -89,8 +89,8 @@ bool CTextHandler::LoadFromRenderedTextUnicode( std::wstring textureText, SDL_Co
 	if( textSurface == NULL )
 	{
 		std::stringstream stream;
-		stream << "Unable to render text surface! SDL_ttf Error: %s\n" << TTF_GetError();
-		Log->WriteTxt(stream.str());
+		stream << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError();
+		//Log->WriteTxt(stream.str());
 	}
 	else
 	{
@@ -99,8 +99,8 @@ bool CTextHandler::LoadFromRenderedTextUnicode( std::wstring textureText, SDL_Co
 		if( mTexture == NULL )
 		{
 			std::stringstream stream;
-			stream << "Unable to create texture from rendered text! SDL Error: %s\n" << SDL_GetError();
-			Log->WriteTxt(stream.str());
+			stream << "Unable to create texture from rendered text! SDL Error: " << SDL_GetError();
+			//Log->WriteTxt(stream.str());
 		}
 		else
 		{

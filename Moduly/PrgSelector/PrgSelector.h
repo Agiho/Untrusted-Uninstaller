@@ -11,6 +11,7 @@
 #include "ChkPrg.h"
 #include "MsgBox.h"
 #include "UninstMgr.h"
+#include "Terminator.h"
 
 class CPrgSelector
 {
@@ -31,6 +32,9 @@ public:
 
 	// sets pointer to uninstallation menager
 	void SetUninstMgr(CUninstMgr *Mgr);
+
+	// sets pointer to class for terminate processes
+	void SetTerminator(CTerminator *TTerminator);
 
 	// update functions for object that need it
 	void Update();
@@ -70,6 +74,9 @@ private:
 	//uninstall menager
 	CUninstMgr *UninstMgr;
 
+	//process terminator
+	CTerminator *Terminator;
+
 	//text color
 	SDL_Color TxtColor;
 
@@ -77,6 +84,7 @@ private:
 	CTextHandler HowManyUninst;
 	CTextHandler WhereConnected;
 	CTextHandler WhereInstall;
+	CTextHandler IPInfo;
 	CInputTextBox IPBox;
 	CInputTextBox InputFilter;
 
@@ -85,12 +93,13 @@ private:
 	CButton FromFile;
 	CButton Begin;
 	CButton Filter;
-
-	//messagebox
-	CMsgBox MsgYesNo;
+	CButton Terminate;
 
 	//need prepare some installations
 	bool BNeedPrepare;
+
+	//true when show Process terminator Window
+	bool BShowTerminator;
 
 	//preparation for uninstallation class
 	CPrepareUninst WPrepUninst;

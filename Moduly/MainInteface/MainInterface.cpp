@@ -20,9 +20,18 @@ void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker , CWMIRun *WMI , SDL_Rend
 	WAIWin.Init(TLog, TexCont.LoadTex(GetTexbyID(1)), Render, butpos, ScrW, ScrH,  FontPath);
 	Select.Init(TLog, RExec, ScrW, ScrH, Render, &Programs, FontPath, TexCont.LoadTex(GetTexbyID(2)), TexCont.LoadTex(GetTexbyID(3)), TexCont.LoadTex(GetTexbyID(1)));
 
-	UninstMgr.Init(TLog);
+	UninstMgr.Init(TLog,&Terminator);
 	Select.SetUninstMgr(&UninstMgr);
-	
+
+	//process terminator
+	SDL_Rect TerminSize;
+	TerminSize.h = ScrH - 2*butpos.h;
+	TerminSize.y = butpos.h;
+	TerminSize.w = 300;
+	TerminSize.x = ScrW/2 - TerminSize.w/2;
+	Terminator.Init(TLog, Render, TerminSize, TexCont.LoadTex(GetTexbyID(2)), TexCont.LoadTex(GetTexbyID(1)), butpos.w, butpos.w/2, butpos.h, FontPath);
+	Select.SetTerminator(&Terminator);
+
 	//infobox about getting program list;
 	SDL_Rect InfoSize;
 	InfoSize.x = 100;

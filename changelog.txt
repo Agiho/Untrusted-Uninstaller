@@ -5,6 +5,22 @@
 =========================================================================================================
 
 
+# v0.2.0:
+
+Fixed:
+
+-Now Key longer than 128 character can be stored properly
+
+
+
+Added:
+
+-Window where user adds programs to terminate during uninstall process
+
+
+---------------------------------------------------------------
+
+
 # v0.1.3:
 
 Fixed:

@@ -1,3 +1,6 @@
+#ifndef SProcessInfo_h
+#define SProcessInfo_h
+
 #include <string>
 
 struct SProcessInfo
@@ -8,4 +11,7 @@ struct SProcessInfo
 
 	std::string Name;// process name
 
+	bool BChecked; // needed in checkboxes
 };
+
+#endif

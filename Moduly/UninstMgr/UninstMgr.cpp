@@ -8,9 +8,10 @@ CUninstMgr::CUninstMgr()
 
 }
 
-void CUninstMgr::Init(CLog *TLog)
+void CUninstMgr::Init(CLog *TLog, CTerminator *TTerminator)
 {
 	Log = TLog;
+	Terminator = TTerminator;
 
 	InfoMsg.IstertLog(TLog);
 	InfoMsg.MakeOK();
@@ -35,6 +36,8 @@ void CUninstMgr::StartUninstall(std::vector<std::string> Where, std::vector<CUin
 		WMI->InsertLog(Log);
 		WMI->SecPrevAdded(true); //there shoudl always exist WMI object which connect somewhere before using this class
 		WMI->ConnectWMI(Where[i],User, Pass); //connect
+		Log->WriteTxt("Time to terminate");
+		if(Terminator != nullptr) if(WMI->IsConnected()) Terminator->Terminate(WMI); //terminate all checked processes in container i terminator
 		if(!TUninstlst.empty()) 
 		{
 			//create info object about uninstall processes on this computer
@@ -66,6 +69,7 @@ void CUninstMgr::StartUninstall(std::vector<std::string> Where, std::vector<CUin
 		}
 
 	}
+	Terminator->ClrLst();
 }
 
 void CUninstMgr::Update()

@@ -27,6 +27,7 @@ void CButton::Init(int Tx, int Ty, int Tw, int Th, std::shared_ptr<CTexture> TBu
 {
 	Log = TLog;
 	Renderer = Render;
+	PathFont = FontPath;
 	PPos.x = Tx;
 	PPos.y = Ty;
 	IWidth = Tw;
@@ -191,13 +192,17 @@ void CButton::SetCaption(std::string Cap)
 {
 	Caption = Cap;
 	SDL_Color Col = { 0,0,0 };
-	//Set Text to render
-	CaptionH.LoadFromRenderedText(Caption, Col);
+	//Set Text to render	
 	SDL_Point Point;
+	CaptionH.LoadFromRenderedText(Caption, Col);
 	//Calculating text position starting point
 	Point.x = PPos.x + (IWidth / 2) - CaptionH.GetWidth() /2 ;
 	Point.y = PPos.y + (IHeight / 2) - (CaptionH.GetHeight() / 2);
-	CaptionH.SetPos(Point);
+	
+	int Size = IHeight/2;
+	CaptionH.Init(Point, PathFont, Size + 1, Log, Renderer);
+	CaptionH.LoadFromRenderedText(Caption, Col);
+	
 }
 std::string CButton::GetCaption()
 {
