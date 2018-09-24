@@ -53,6 +53,9 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 		TLog, Render,"","", Font);
 	LogIn.ChangeVis(true);
 	LogIn.SetCaption("Zaloguj");
+
+	//activation first inputbox
+	IP.ChangeActiv(true);
 }
 
 void CUserAndIP::Render()
@@ -81,9 +84,32 @@ void CUserAndIP::Render()
 bool CUserAndIP::HandleEvent(SDL_Event *e)
 {
 	//input into textboxes
-	IP.Input(e);
-	User.Input(e);
-	Password.Input(e);
+	auto BChoice = IP.Input(e);
+	if(BChoice == SDLK_TAB)
+	{
+		IP.ChangeActiv(false);
+		User.ChangeActiv(true);
+		return false;
+	}
+	else if(BChoice == SDLK_RETURN) return true;
+
+	BChoice = User.Input(e);
+	if(BChoice == SDLK_TAB)
+	{
+		User.ChangeActiv(false);
+		Password.ChangeActiv(true);
+		return false;
+	}
+	else if(BChoice == SDLK_RETURN) return true;
+
+	BChoice = Password.Input(e);
+	if(BChoice == SDLK_TAB)
+	{
+		Password.ChangeActiv(false);
+		IP.ChangeActiv(true);
+		return false;
+	}
+	else if(BChoice == SDLK_RETURN) return true;
 
 	//only if button clicked returns true
 	return LogIn.HandleEvent(e);

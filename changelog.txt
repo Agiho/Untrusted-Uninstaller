@@ -5,6 +5,19 @@
 =========================================================================================================
 
 
+
+# v0.2.1:
+
+Fixed:
+
+-Now boxes in connecting section can be switched using Tab button
+-When Enter pressed when inputbox is active start defoult action for it ( + or OK)
+
+
+
+---------------------------------------------------------------
+
+
 # v0.2.0:
 
 Fixed:

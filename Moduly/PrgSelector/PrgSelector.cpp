@@ -148,7 +148,7 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 {
 	if(!BNeedPrepare && !BShowTerminator) // handle this when window for preparing string is bot active
 	{
-		if(Plus.HandleEvent(e)) //plus button event
+		if(Plus.HandleEvent(e) || (IPBox.Input(e) == SDLK_RETURN)) //plus button events and input box
 		{
 			if(IPBox.GetText() != "")
 			{
@@ -183,7 +183,7 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 		{
 			BShowTerminator = true;
 		}
-		if(Filter.HandleEvent(e))
+		if(Filter.HandleEvent(e) || (InputFilter.Input(e) == SDLK_RETURN)) //filter button events and input box events and waiting for enter button
 		{
 			auto FilterTxt = InputFilter.GetText();
 			if((FilterTxt == "") || (FilterTxt == " ")) // if there is no filter
@@ -231,10 +231,6 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 			}
 		}
 
-		 //input to inputbox
-		IPBox.Input(e);
-		InputFilter.Input(e);
-
 		//checkboxes events
 		PrgChkBox.HandleEvent(e);
 		CompChkBox.HandleEvent(e);
@@ -245,7 +241,7 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 	}
 	else if(BShowTerminator)
 	{
-		if(Terminator->HandleEvent(e)) BShowTerminator = false;;
+		if(Terminator->HandleEvent(e)) BShowTerminator = false;
 	}
 }
 

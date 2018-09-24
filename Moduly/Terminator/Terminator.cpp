@@ -34,9 +34,11 @@ void CTerminator::Init(CLog *TLog, SDL_Renderer *Render, SDL_Rect Size, std::sha
 
 
 	InputBox.Init(TLog,ContPos, FontPath, Render, Col, (ButH/2) - 2);
+	InputBox.ChangeActiv(true);
 
 	Plus.Init(ContPos.x + ContPos.w, ContPos.y, But2W, ButH,Buttons,ButW, 0, TLog, Render, "", "",FontPath);
-	OK.Init(ContPos.x + (Window.w/2) - ButW/2, ContPos.y + ButH, ButW,ButH - 10, Buttons,0,0,TLog, Render, "", "", FontPath);
+	OK.Init(ContPos.x + (Window.w/2) - ButW/2, ContPos.y + ButH, ButW,ButH , Buttons,0,0,TLog, Render, "", "", FontPath);
+	OK.SetDiam(ButW, ButH - 10);
 	OK.SetCaption("OK");
 
 }
@@ -128,7 +130,8 @@ void CTerminator::Terminate(CWMIRun *WMI, std::vector<std::string> ProcNames)
 
 bool CTerminator::HandleEvent(SDL_Event *e)
 {
-	if(Plus.HandleEvent(e))
+
+	if(Plus.HandleEvent(e) || (InputBox.Input(e) == SDLK_RETURN))
 	{
 		if(InputBox.GetText() != "")
 		{
@@ -138,6 +141,7 @@ bool CTerminator::HandleEvent(SDL_Event *e)
 			ChkBoxCont.AddNewOne(TProc); //add to checkbox container
 			InputBox.SetTxt("");
 		}
+		else return true;
 	}
 
 	if(OK.HandleEvent(e))
@@ -145,8 +149,6 @@ bool CTerminator::HandleEvent(SDL_Event *e)
 		return true;
 	}
 
-
-	InputBox.Input(e);
 
 	ChkBoxCont.HandleEvent(e);
 

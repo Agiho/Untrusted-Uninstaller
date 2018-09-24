@@ -25,7 +25,7 @@ void CInputTextBox::Init(CLog *TLog, SDL_Rect Pos, std::string FontPath, SDL_Ren
 	BInput = false;
 }
 
-void CInputTextBox::Input(SDL_Event *e)
+int CInputTextBox::Input(SDL_Event *e)
 {
 	
 	if (e->type == SDL_MOUSEBUTTONDOWN)
@@ -73,7 +73,18 @@ void CInputTextBox::Input(SDL_Event *e)
 				Txt.pop_back(); 
 				renderText = true;
 
-			} //Handle copy else 
+			} 
+			//Enter button clicked
+			if (e->key.keysym.sym == SDLK_RETURN)
+			{
+				return SDLK_RETURN;
+			}
+			//TAB button clicked
+			if (e->key.keysym.sym == SDLK_TAB)
+			{
+				return SDLK_TAB;
+			}
+			//Handle copy else 
 			if (e->key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)
 			{
 				SDL_SetClipboardText(Txt.c_str());
@@ -130,6 +141,17 @@ void CInputTextBox::Input(SDL_Event *e)
 			}
 		}
 	}
+	return 0;
+}
+
+void CInputTextBox::ChangeActiv(bool Activation)
+{
+	BInput = Activation;
+}
+
+bool CInputTextBox::IsActive()
+{
+	return BInput;
 }
 
 std::string CInputTextBox::GetText()
@@ -163,8 +185,10 @@ void CInputTextBox::ChangeColor(SDL_Color textCol)
 void CInputTextBox::Render()
 {
 	//render box
-	SDL_SetRenderDrawColor( Renderer, 0xFF, 0xFF, 0xFF, 0xFF  ); // white
+	if(!BInput) SDL_SetRenderDrawColor( Renderer, 0xFF, 0xFF, 0xFF, 0xFF  ); // white
+	else SDL_SetRenderDrawColor( Renderer, 0, 0xFF, 0xFF, 0xFF  );
 	SDL_RenderFillRect( Renderer, &RPos ); //render filled rect
+
 	SDL_SetRenderDrawColor( Renderer, 0x00, 0x00, 0x00, 0xFF ); //black
 	SDL_RenderDrawRect( Renderer, &RPos ); //border
 

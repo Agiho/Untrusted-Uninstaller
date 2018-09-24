@@ -46,6 +46,9 @@ void CPrepareUninst::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Re
 	///////////////////////////
 	BOK = true; //is all ok (when its not run first time its must be OK)
 	Element = 0; // starting element
+
+	//Activate input box
+	Parameters.ChangeActiv(true);
 }
 
 void CPrepareUninst::Render()
@@ -68,10 +71,9 @@ void CPrepareUninst::HandleEvent(SDL_Event *e)
 	
 	if(!BOK)
 	{
-		Parameters.Input(e); // handle input 
 
 		//only if button clicked returns true
-		if(Next.HandleEvent(e))
+		if(Next.HandleEvent(e) || (Parameters.Input(e) == SDLK_RETURN)  /* handle input*/ )
 		{
 			std::string Param = "";
 			Param = Parameters.GetText(); // get parameter from user

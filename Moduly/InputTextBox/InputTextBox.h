@@ -12,7 +12,11 @@ public:
 	void Init(CLog *TLog, SDL_Rect Pos, std::string FontPath, SDL_Renderer *Render,SDL_Color Color, unsigned int Size = 0);
 
 	//text input function
-	void Input(SDL_Event *e);
+	int Input(SDL_Event *e);
+
+	//Activity
+	void ChangeActiv(bool Activation);
+	bool IsActive();
 
 	//returns contained text
 	std::string GetText();
