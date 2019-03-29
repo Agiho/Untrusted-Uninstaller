@@ -15,6 +15,8 @@
 #include "RSrvStart.h"
 #include "PrgSelector.h"
 #include "InfoBox.h"
+#include "ScriptRunner.h"
+#include "Config.h"
 
 
 class CMainInterface
@@ -23,7 +25,7 @@ class CMainInterface
 public:
 
 	//initialize interface, sets positions and initiates buttons
-	void Init(CLog *TLog, ChkPrg *TChecker, CWMIRun *WMI, SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath);
+	void Init(CLog *TLog, CConfig *Cfg, ChkPrg *TChecker, CWMIRun *WMI, SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath);
 
 	//render interface
 	void Render();
@@ -85,6 +87,9 @@ private:
 
 	//object for terminate processes
 	CTerminator Terminator;
+
+	//object for running scripts files
+	CScriptRunner ScriptRunner;
 
 	//Login Info
 

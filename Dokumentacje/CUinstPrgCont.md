@@ -5,14 +5,18 @@ Klasa przechowująca informacje do oinstalowania programu
 | Funkcja                                  | Opis                                     |
 | ---------------------------------------- | ---------------------------------------- |
 | `int Add(std::string TName, std::string Uninst, std::string QUninst)` | ***dodaje do obiektu dane i sprawdza poprawność ścieżki do deinstalacji*** **argument 1:** Nazwa programu **Argument 2:** Scieżka do odinstalowania **Argument 3:** ścieżka do cichego odinstalowania o ile istnieje |
+| `bool operator<(const CUinstPrgCont &q)` | ***Służy do porównywania nazw obiektów znajdujących sie w kontenerze*** | 
 
 
 ### Klasy zaprzyjaźnione:
 
-friend class CPrepareUninst
-friend class CPrgSelector
-friend class CUninstMgr
-template <typename T> friend class CCheckBoxCont
+`friend class CPrepareUninst`
+
+`friend class CPrgSelector`
+
+`friend class CUninstMgr`
+
+`template <typename T> friend class CCheckBoxCont`
 
 Dostępna pola dla przyjaciół:
 

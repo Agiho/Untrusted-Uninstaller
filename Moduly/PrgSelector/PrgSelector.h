@@ -12,6 +12,8 @@
 #include "MsgBox.h"
 #include "UninstMgr.h"
 #include "Terminator.h"
+#include "ScriptRunner.h"
+#include "FilesList.h"
 
 class CPrgSelector
 {
@@ -33,8 +35,11 @@ public:
 	// sets pointer to uninstallation menager
 	void SetUninstMgr(CUninstMgr *Mgr);
 
-	// sets pointer to class for terminate processes
+	// sets pointer to object  for terminate processes
 	void SetTerminator(CTerminator *TTerminator);
+
+	// sets pointer to script runner
+	void SetScriptRunner(CScriptRunner *TScriptRunner);
 
 	// update functions for object that need it
 	void Update();
@@ -77,6 +82,9 @@ private:
 	//process terminator
 	CTerminator *Terminator;
 
+	//script runner
+	CScriptRunner *ScriptRunner;
+
 	//text color
 	SDL_Color TxtColor;
 
@@ -94,12 +102,16 @@ private:
 	CButton Begin;
 	CButton Filter;
 	CButton Terminate;
+	CButton SelectScript;
 
 	//need prepare some installations
 	bool BNeedPrepare;
 
 	//true when show Process terminator Window
 	bool BShowTerminator;
+
+	//true when show Script Runner Window
+	bool BShowScriptRunner;
 
 	//preparation for uninstallation class
 	CPrepareUninst WPrepUninst;

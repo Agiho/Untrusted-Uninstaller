@@ -307,7 +307,7 @@ int CWMIRun::ConnectWMI( string SComp,string SUser , string SPass, bool Force64,
     if (localconn)
         hres = CoSetProxyBlanket(
            pSvc,                        // Indicates the proxy to set
-           RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
+           RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx       ///////////////////////////////////////////////////
            RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
            NULL,                        // Server principal name
            RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx
@@ -443,7 +443,7 @@ int CWMIRun::ExecMethod(string SMeth)
 
 	NULL, pClassInstance, &pOutParams, &res);
 
-	Sleep(10);
+	Sleep(1);
 
 	if (FAILED(hres))
 
