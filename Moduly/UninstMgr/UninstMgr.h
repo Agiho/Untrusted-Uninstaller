@@ -22,7 +22,9 @@ public:
 
 	void Update(); //menage uninstall processes
 
+	//status functions
 	std::vector<std::pair<int, bool> > GetStatus(); // returns status for all programs
+	bool AllEnd(); //true when all ends
 
 private:
 
@@ -43,6 +45,8 @@ private:
 	std::vector<CUinstPrgCont> Uninstlst; //uninstall paths container
 	
 	std::vector<std::pair<int, bool> > About; // which program currenlty executing, true when all finished, in which WMI object(specified ovject in container)
+
+	void Disconnect(); //clear vector with Objects connected by WMI and disconnects them
 
 };
 #endif

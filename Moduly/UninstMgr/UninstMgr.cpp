@@ -36,7 +36,7 @@ void CUninstMgr::StartUninstall(std::vector<std::string> Where, std::vector<CUin
 		WMI->InsertLog(Log);
 		WMI->SecPrevAdded(true); //there shoudl always exist WMI object which connect somewhere before using this class
 		WMI->ConnectWMI(Where[i],User, Pass); //connect
-		Log->WriteTxt("Time to terminate");
+
 		if(Terminator != nullptr) if(WMI->IsConnected()) Terminator->Terminate(WMI); //terminate all checked processes in container i terminator
 		if(!TUninstlst.empty()) 
 		{
@@ -105,4 +105,28 @@ void CUninstMgr::Update()
 std::vector<std::pair<int, bool> > CUninstMgr::GetStatus()
 {
 	return About;
+}
+
+bool CUninstMgr::AllEnd()
+{
+	if (About.empty()) return false;
+	int end = 0;
+	for (int i = 0; i < About.size(); ++i)
+	{
+		if (About[i].second) ++end;
+	}
+	if (end == About.size()) 
+	{
+		Disconnect();
+		return true;
+	}
+	else return false;
+}
+
+void CUninstMgr::Disconnect()
+{
+	if(!WMIobj.empty())
+	{
+		WMIobj.erase(WMIobj.begin(), WMIobj.end());
+	}
 }

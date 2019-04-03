@@ -1,4 +1,4 @@
-## **CRSrvStart**
+## **CSlider**
 
 Klasa która zajmuje sie obsługa suwaka, przechowywaniem obecnej wartośći przesuwanej rzeczy i wyświetleniem suwaka
 

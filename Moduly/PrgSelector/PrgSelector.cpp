@@ -6,6 +6,7 @@ CPrgSelector::CPrgSelector()
 	BNeedPrepare = false;
 	BRenderPrg = false;
 	BShowTerminator = false;
+	BShowScriptRunner = false;
 	BFilter = false;
 
 	WMI = nullptr;
@@ -20,10 +21,12 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	BRenderPrg = false;
 	BFilter = false;
 	BShowTerminator = false;
+	BShowScriptRunner = false;
+
 	int ButH = 50;
 	int ButW = 100;
 	Log = TLog;
-	
+
 	WMI = TWMI;
 
 	SDL_Color C = {0,0,0};
@@ -38,6 +41,9 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	Begin.Init(ScrW - ButW - 10, ScrH - ButH - 10, ButW, ButH, StdButton,0,0, TLog, Render, "","", FontPath);
 	Begin.SetDiam(ButW, ButH -10);
 	Begin.SetCaption("Start");
+	SelectScript.Init(ScrW - ButW - 10, ScrH - 2*ButH - 20, ButW, ButH, StdButton, 0, 0, TLog, Render, "", "", FontPath);
+	SelectScript.SetDiam(ButW, ButH - 10);
+	SelectScript.SetCaption("Skrypty");
 	Terminate.Init(ScrW - ButW*3 - 5, ScrH - ButH - 10, ButW, ButH, StdButton,0,0, TLog, Render, "","", FontPath);
 	Terminate.SetDiam(ButW*2 - 10, ButH - 10);
 	Terminate.SetCaption("Przerwij proces");
@@ -85,9 +91,9 @@ void CPrgSelector::Init(CLog *TLog, CWMIRun *TWMI, unsigned int ScrW ,unsigned i
 	PrgChkBox.Init(TLog,Frame, 50, ScrW ,ScrH ,Render, Programslst, FontPath, FirstSlid);
 
 	Frame.w = (ButW*2);
-	Frame.h = (ScrH/2) + 140;
+	Frame.h = (ScrH/2) + 140 - ButH - 20;
 	Frame.x = ScrW - (ButW*2) - 100;
-	Frame.y = ScrH - Frame.h - ButH - 15;
+	Frame.y = ScrH - Frame.h - 2*ButH - 15 - 20;
 
 	CompChkBox.Init(TLog,Frame,50, ScrW, ScrH, Render, &CompNames, FontPath, FirstSlid);
 	NrCheckedPrg = 0;
@@ -124,6 +130,11 @@ void CPrgSelector::SetTerminator(CTerminator *TTerminator)
 	Terminator = TTerminator;
 }
 
+void CPrgSelector::SetScriptRunner(CScriptRunner *TScriptRunner)
+{
+	ScriptRunner = TScriptRunner;
+}
+
 void CPrgSelector::Update()
 {
 	//update checboxes and info about how many checked
@@ -141,16 +152,47 @@ void CPrgSelector::Update()
 		BNeedPrepare = !(WPrepUninst.AllOK());		
 	}
 
-	if(UninstMgr != nullptr)UninstMgr->Update();
+	if(UninstMgr != nullptr)
+	{
+		UninstMgr->Update();
+		if(UninstMgr->AllEnd()) 
+		{
+
+			if(!(ScriptRunner->IsStarted())) //if not already started
+			{
+				// Show MessageBox with info
+				CMsgBox InfoMsg;
+				InfoMsg.IstertLog(Log);
+				InfoMsg.MakeOK();
+				InfoMsg.ShowMsg("Procesy odinstalowywania" , "Wszystkie procesy odinstalowywania wykonane");
+
+				std::vector<std::string> Comps;
+	
+				Comps.push_back(WMI->Getloc());
+
+				if(!CompNames.empty())
+				{
+					for(int i = 0; i < CompNames.size(); ++i)
+					{
+						Comps.push_back(CompNames[i].Name); //adds computer adressess from computers list to vector
+					}
+				}
+				
+				ScriptRunner->RunScript(Comps); // run selected scripts on computers
+
+			}
+		}
+	}
+	
 }
 
 void CPrgSelector::HandleEvent(SDL_Event *e)
 {
-	if(!BNeedPrepare && !BShowTerminator) // handle this when window for preparing string is bot active
+	if (!BNeedPrepare && !BShowTerminator && !BShowScriptRunner) // handle this when window for preparing string is bot active
 	{
-		if(Plus.HandleEvent(e) || (IPBox.Input(e) == SDLK_RETURN)) //plus button events and input box
+		if (Plus.HandleEvent(e) || (IPBox.Input(e) == SDLK_RETURN)) //plus button events and input box
 		{
-			if(IPBox.GetText() != "")
+			if (IPBox.GetText() != "")
 			{
 				SCompInfo TComp;
 				TComp.Name = IPBox.GetText(); //get IP/name of computer from input box
@@ -159,7 +201,7 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 				IPBox.SetTxt("");
 			}
 		}
-		if(FromFile.HandleEvent(e)) //from file button clicked
+		if (FromFile.HandleEvent(e)) //from file button clicked
 		{
 			CBasicFileDialog Dial;
 			Dial.CreateOpenFileDialog(NULL, "Wybierz Plik", "C:\\", "All files(*.*)\0*.*\0TextFiles(*.txt)\0*.txt\0", 2); //open file dialog
@@ -167,34 +209,38 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 			Log->WriteTxt("Reading computers list from file " + std::string(path));
 			FileRead(path); //load computers list from file
 		}
-		if(Begin.HandleEvent(e)) //begin button clicked
+		if (Begin.HandleEvent(e)) //begin button clicked
 		{
 			CMsgBox MsgYesNo;
 			MsgYesNo.IstertLog(Log);
 			MsgYesNo.MakeYesNo();
-			if(MsgYesNo.ShowMsg("Odinstalowywanie Oprogramowania", "Czy na pewno chcesz by te programy odinstalowano?") == 1)
+			if (MsgYesNo.ShowMsg("Odinstalowywanie Oprogramowania", "Czy na pewno chcesz by te programy odinstalowano?") == 1)
 			{
 				WPrepUninst.CheckPrg(PrgChkBox.GetChk()); //check that programs sings are correct
-				if(WPrepUninst.AllOK()) BeginUninstall(WPrepUninst.GetPrg()); //if ok begin uninsall			
+				if (WPrepUninst.AllOK()) BeginUninstall(WPrepUninst.GetPrg()); //if ok begin uninsall			
 				else BNeedPrepare = true; //if not need prepare it
 			}
 		}
-		if(Terminate.HandleEvent(e)) //begin button clicked
+		if (SelectScript.HandleEvent(e))// ScriptRunner button clicked
+		{
+			BShowScriptRunner = true;
+		}
+		if (Terminate.HandleEvent(e)) //terminator button clicked
 		{
 			BShowTerminator = true;
 		}
-		if(Filter.HandleEvent(e) || (InputFilter.Input(e) == SDLK_RETURN)) //filter button events and input box events and waiting for enter button
+		if (Filter.HandleEvent(e) || (InputFilter.Input(e) == SDLK_RETURN)) //filter button events and input box events and waiting for enter button
 		{
 			auto FilterTxt = InputFilter.GetText();
-			if((FilterTxt == "") || (FilterTxt == " ")) // if there is no filter
+			if ((FilterTxt == "") || (FilterTxt == " ")) // if there is no filter
 			{
-				if(BFilter)
+				if (BFilter)
 				{
 					BFilter = false;
 					PrgChkBox.SetNewList(Uninstlst);
-					if(!Filtered.empty())
+					if (!Filtered.empty())
 					{
-						for(int i = 0; i < Filtered.size(); ++i)
+						for (int i = 0; i < Filtered.size(); ++i)
 						{
 							(*FilterMainCon[i]) = Filtered[i];
 						}
@@ -205,24 +251,24 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 			}
 			else
 			{
-				if(!Uninstlst->empty())
+				if (!Uninstlst->empty())
 				{
-					if(!Filtered.empty())
+					if (!Filtered.empty())
 					{
-						for(int i = 0; i < Filtered.size(); ++i)
+						for (int i = 0; i < Filtered.size(); ++i)
 						{
 							(*FilterMainCon[i]) = Filtered[i];
 						}
 						Filtered.erase(Filtered.begin(), Filtered.end());
 						FilterMainCon.erase(FilterMainCon.begin(), FilterMainCon.end());
 					}
-					for(int i = 0; i < Uninstlst->size(); ++i)
+					for (int i = 0; i < Uninstlst->size(); ++i)
 					{
-						if((*Uninstlst)[i].Name.find(FilterTxt.c_str()) != std::string::npos )
+						if ((*Uninstlst)[i].Name.find(FilterTxt.c_str()) != std::string::npos)
 						{
 
 							Filtered.push_back((*Uninstlst)[i]);
-							FilterMainCon.push_back( &( (*Uninstlst)[i]) );
+							FilterMainCon.push_back(&((*Uninstlst)[i]));
 							PrgChkBox.SetNewList(&Filtered);
 							BFilter = true;
 						}
@@ -235,13 +281,17 @@ void CPrgSelector::HandleEvent(SDL_Event *e)
 		PrgChkBox.HandleEvent(e);
 		CompChkBox.HandleEvent(e);
 	}
-	else if(BNeedPrepare)
+	else if (BNeedPrepare)
 	{
 		WPrepUninst.HandleEvent(e); //prepare window events
 	}
-	else if(BShowTerminator)
+	else if (BShowTerminator)
 	{
-		if(Terminator->HandleEvent(e)) BShowTerminator = false;
+		if (Terminator->HandleEvent(e)) BShowTerminator = false;
+	}
+	else if (BShowScriptRunner)
+	{
+		if (ScriptRunner->HandleEvent(e)) BShowScriptRunner = false;
 	}
 }
 
@@ -259,6 +309,7 @@ void CPrgSelector::Render()
 	Plus.Render();
 	FromFile.Render();
 	Begin.Render();
+	SelectScript.Render();
 	Filter.Render();
 	Terminate.Render();
 
@@ -272,6 +323,10 @@ void CPrgSelector::Render()
 	if(BShowTerminator)
 	{
 		Terminator->Render();
+	}
+	if (BShowScriptRunner)
+	{
+		ScriptRunner->Render();
 	}
 }
 

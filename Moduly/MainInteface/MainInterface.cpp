@@ -1,6 +1,6 @@
 #include "MainInterface.h"
 
-void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker , CWMIRun *WMI , SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath)
+void CMainInterface::Init(CLog *TLog, CConfig *Cfg, ChkPrg *TChecker , CWMIRun *WMI , SDL_Renderer* Render, unsigned int ScrW, unsigned int ScrH, std::string FontPath)
 {
 	Phase = LOCALCH; // set starting phase
 	Log = TLog;
@@ -31,6 +31,15 @@ void CMainInterface::Init(CLog *TLog, ChkPrg *TChecker , CWMIRun *WMI , SDL_Rend
 	TerminSize.x = ScrW/2 - TerminSize.w/2;
 	Terminator.Init(TLog, Render, TerminSize, TexCont.LoadTex(GetTexbyID(2)), TexCont.LoadTex(GetTexbyID(1)), butpos.w, butpos.w/2, butpos.h, FontPath);
 	Select.SetTerminator(&Terminator);
+
+	//script runner
+	SDL_Rect ScriptSize;
+	ScriptSize.h = ScrH - 2 * butpos.h;
+	ScriptSize.y = butpos.h;
+	ScriptSize.w = 300;
+	ScriptSize.x = ScrW / 2 - ScriptSize.w / 2;
+	ScriptRunner.Init(TLog, Render, ScriptSize, TexCont.LoadTex(GetTexbyID(2)), TexCont.LoadTex(GetTexbyID(1)), butpos.w, butpos.w / 2, butpos.h, Cfg->GetMainLoc(), FontPath);
+	Select.SetScriptRunner(&ScriptRunner);
 
 	//infobox about getting program list;
 	SDL_Rect InfoSize;
@@ -103,6 +112,7 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			Select.SetPrg(&Programs);
 			Select.SetWhereConnected("Ten Komputer");
 			UninstMgr.AddCred();
+			ScriptRunner.AddCred();
 			Phase = PRG_SELECT;
 			BRenderInfo = false;
 		}
@@ -136,11 +146,13 @@ void CMainInterface::HandleEvent(SDL_Event *e)
 			{
 				RExec->ConnectWMI(IP);
 				UninstMgr.AddCred();
+				ScriptRunner.AddCred();
 			}
 			else
 			{
 				RExec->ConnectWMI(IP, USER, PASSWORD);
 				UninstMgr.AddCred(USER, PASSWORD);
+				ScriptRunner.AddCred(USER, PASSWORD);
 			}
 			
 

@@ -11,16 +11,19 @@
 #include "WMIRun.h"
 #include "Window.h"
 #include "Texture.h"
+#include "Config.h"
 #include "MainInterface.h"
 
 
 int main(int argc, char *argv[])
 {
 	std::stringstream File;
-	File << "C:/Temp/Log"<< time(NULL) << ".txt";
+	File << "C:/Temp/Log"<< time(NULL) << ".log";
 	CLog Log(File.str());
+	CConfig Cfg;
 	ChkPrg Checker;
 	CWMIRun RExec;
+	Cfg.Init(&Log);
 	Checker.InsertLog(&Log);
 	RExec.InsertLog(&Log);
 	
@@ -44,7 +47,7 @@ int main(int argc, char *argv[])
 	SDL_Event e;
 	{
 		
-	Main.Init(&Log, &Checker, &RExec, pRenderer, 960,720,"c:/Windows/Fonts/times.ttf");
+	Main.Init(&Log, &Cfg, &Checker, &RExec, pRenderer, 960,720,"c:/Windows/Fonts/times.ttf");
 
 	auto BQuit = false;
 	
@@ -77,7 +80,6 @@ int main(int argc, char *argv[])
 
 	//MainWindow.Close();
 
-	//Log.~CLog();
 	//END
 	return 0;
 }
