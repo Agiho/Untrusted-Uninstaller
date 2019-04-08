@@ -7,6 +7,22 @@
 
 
 
+# v0.3.1:
+
+Fixed:
+
+-Increase time between WMI start process and WMI get its PID
+
+
+Added:
+
+-Icon on Window and taskbar
+-Change credentials button
+-Now texboxes where user input credentials is defoult invisible 
+
+---------------------------------------------------------------
+
+
 # v0.3.0:
 
 Added:
@@ -37,7 +53,6 @@ Fixed:
 -Now Key longer than 128 character can be stored properly
 
 
-
 Added:
 
 -Window where user adds programs to terminate during uninstall process
@@ -53,7 +68,6 @@ Fixed:
 -Slider button size calculation when new list haven't many objects
 -UTF-8 support in inputboxes
 -password inputbox now hide password(shows only '*')
-
 
 
 Added:

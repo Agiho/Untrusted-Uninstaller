@@ -15,7 +15,7 @@ class CWindow
 public:
 
 	// Initialize variables by defoult
-	CWindow(std::string WTitle, CLog* LogT,int SCRW = 1024, int SCRH = 768, Uint32 Type = SDL_WINDOW_FULLSCREEN);
+	CWindow(std::string WTitle, CLog* LogT,int SCRW = 1024, int SCRH = 768, Uint32 Type = SDL_WINDOW_FULLSCREEN, std::string IconPathT = "");
 
 	// Deallocate memory
 	~CWindow();
@@ -48,6 +48,7 @@ private:
 	int ScrHeight;
 	Uint32 WType;
 	std::string Title;
+	std::string IconPath;
 	CLog* Log;
 
 };

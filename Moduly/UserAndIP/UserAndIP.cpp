@@ -4,6 +4,7 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 		unsigned int SCrW,  unsigned int SCrH, std::string Font)
 {
 	Log = TLog;
+	BShowUserPass = false;
 	Renderer = Render;
 
 	//sets window position
@@ -47,8 +48,15 @@ void CUserAndIP::Init(CLog *TLog, std::shared_ptr<CTexture> TTexture, SDL_Render
 	PassDescrip.Init(PPos,Font, 15, TLog, Render);
 	PassDescrip.LoadFromRenderedTextUnicode(L"Has³o:", Col);
 
-	//set button
-	Position.y = Position.y + TxtHeight + 10;
+	//set buttons
+
+	ShowUserPass.Init((Position.x + ((Position.w/3) / 2)) - 20 -  PosButTex.w / 2, Window.y + (Window.h / 2) + 10, PosButTex.w, PosButTex.h, TTexture, PosButTex.x, PosButTex.y,
+		TLog, Render,"","", Font);
+	ShowUserPass.ChangeVis(true);
+	ShowUserPass.SetDiam(PosButTex.w*3, PosButTex.h);
+	ShowUserPass.SetCaption("Edytuj dane logowania");
+
+	Position.y = Position.y + TxtHeight + 20;
 	LogIn.Init((Position.x + (Position.w / 2)) - PosButTex.w / 2, Position.y, PosButTex.w, PosButTex.h, TTexture, PosButTex.x, PosButTex.y,
 		TLog, Render,"","", Font);
 	LogIn.ChangeVis(true);
@@ -68,13 +76,20 @@ void CUserAndIP::Render()
 
 	//texts
 	IPDescrip.Render();
-	UserDescrip.Render();
-	PassDescrip.Render();
+	if(BShowUserPass) // when user want to show this fields
+	{
+		UserDescrip.Render();
+		PassDescrip.Render();
+	}
 
 	//inputboxes
 	IP.Render();
-	User.Render();
-	Password.Render();
+	if(BShowUserPass) // when user want to show this fields
+	{
+		User.Render();
+		Password.Render();
+	}
+	else ShowUserPass.Render();
 
 	//button
 	LogIn.Render();
@@ -88,28 +103,40 @@ bool CUserAndIP::HandleEvent(SDL_Event *e)
 	if(BChoice == SDLK_TAB)
 	{
 		IP.ChangeActiv(false);
-		User.ChangeActiv(true);
+		if(BShowUserPass) User.ChangeActiv(true);// when user want to show this fields
 		return false;
 	}
 	else if(BChoice == SDLK_RETURN) return true;
 
-	BChoice = User.Input(e);
-	if(BChoice == SDLK_TAB)
+	if(BShowUserPass) 
 	{
-		User.ChangeActiv(false);
-		Password.ChangeActiv(true);
-		return false;
-	}
-	else if(BChoice == SDLK_RETURN) return true;
+		BChoice = User.Input(e);
+		if(BChoice == SDLK_TAB)
+		{
+			User.ChangeActiv(false);
+			Password.ChangeActiv(true);
+			return false;
+		}
+		else if(BChoice == SDLK_RETURN) return true;
 
-	BChoice = Password.Input(e);
-	if(BChoice == SDLK_TAB)
-	{
-		Password.ChangeActiv(false);
-		IP.ChangeActiv(true);
-		return false;
+		BChoice = Password.Input(e);
+		if(BChoice == SDLK_TAB)
+		{
+			Password.ChangeActiv(false);
+			IP.ChangeActiv(true);
+			return false;
+		}
+		else if(BChoice == SDLK_RETURN) return true;
 	}
-	else if(BChoice == SDLK_RETURN) return true;
+	else
+	{
+		if(ShowUserPass.HandleEvent(e)) 
+		{
+			ShowUserPass.ChangeVis(false);
+			BShowUserPass = true;
+			User.ChangeActiv(true);
+		}
+	}
 
 	//only if button clicked returns true
 	return LogIn.HandleEvent(e);
