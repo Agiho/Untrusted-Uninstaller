@@ -32,6 +32,8 @@ private:
 
 	CLog * Log;
 
+	bool BShowUserPass;
+
 	SDL_Renderer *Renderer;
 
 	//Descriptions
@@ -47,6 +49,7 @@ private:
 	SDL_Rect Window;
 
 	CButton LogIn;
+	CButton ShowUserPass;
 };
 
 #endif

@@ -443,7 +443,7 @@ int CWMIRun::ExecMethod(string SMeth)
 
 	NULL, pClassInstance, &pOutParams, &res);
 
-	Sleep(1);
+	Sleep(8);
 
 	if (FAILED(hres))
 

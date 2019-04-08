@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	//pointer to renderer
 	SDL_Renderer* pRenderer;
 	//Creating Window and initialize it
-	CWindow MainWindow("Untrusted Uninstaller",&Log, 960, 720, SDL_WINDOW_SHOWN);
+	CWindow MainWindow("Untrusted Uninstaller",&Log, 960, 720, SDL_WINDOW_SHOWN, "uu.png");
 	
 	MainWindow.Init();
 

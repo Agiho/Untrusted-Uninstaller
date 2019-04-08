@@ -1,6 +1,6 @@
 #include "Window.h"
 
-CWindow::CWindow(std::string WTitle, CLog* LogT, int SCRW ,int SCRH, Uint32 Type  )
+CWindow::CWindow(std::string WTitle, CLog* LogT, int SCRW ,int SCRH, Uint32 Type, std::string IconPathT)
 {
 
 	//The window we'll be rendering to
@@ -13,6 +13,7 @@ CWindow::CWindow(std::string WTitle, CLog* LogT, int SCRW ,int SCRH, Uint32 Type
 	ScrHeight = SCRH;
 	WType = Type;
 	Title = WTitle;
+	IconPath = IconPathT;
 	Log = LogT ;
 }
 
@@ -92,6 +93,17 @@ bool CWindow::Init()
 							Stream << "SDL_image could not initialize! SDL_image Error: %s\n" << IMG_GetError() << "\n" ;
 							SErrString = Stream.str();
 							throw SErrString;
+						}
+						else
+						{
+							if(!(IconPath == ""))
+							{
+								SDL_Surface *surface = NULL;
+								surface = IMG_Load(IconPath.c_str());
+								if(surface == NULL) Log->WriteTxt("Unable to load window icon");
+								else SDL_SetWindowIcon(Window, surface);
+							}
+
 						}
 					}
 				}
